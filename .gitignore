@@ -1,0 +1,10 @@
+*
+*/
+
+!rtl/
+!sim/
+
+!rtl/*.vhd
+!sim/*.vhd
+
+!.gitignore
