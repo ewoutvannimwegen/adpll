@@ -6,5 +6,7 @@
 
 !rtl/*.vhd
 !sim/*.vhd
+!sim/*.do
 
 !.gitignore
+!hdl-prj.json

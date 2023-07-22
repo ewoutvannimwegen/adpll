@@ -1,0 +1,13 @@
+{
+    "options": {
+        "ghdl_analysis": [
+            "--workdir=work",
+            "--ieee=synopsys",
+            "-fexplicit"
+        ]
+    },
+    "files": [
+        { "file": "rtl/pll.vhd",                       "language": "vhdl" },
+        { "file": "sim/pll_tb.vhd",                       "language": "vhdl" }
+    ]
+}
