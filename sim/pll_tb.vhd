@@ -8,31 +8,36 @@ entity pll_tb is
 end pll_tb;
 
 architecture tb of pll_tb is
-    constant SYSCLK_PERIOD  : time    := 500 ns; -- 2MHz
-    constant CYCLES         : natural := 500;
 
-    signal clk : std_logic := '0';
-    signal led : std_logic := '0';
+    signal i_clk : std_logic := '0';
+    signal i_in : std_logic := '0';
+    signal o_led : std_logic := '0';
 begin
-    clock : process
+    i_clk_proc : process
+        constant SYSCLK_PERIOD  : time := 500 ns; -- 2MHz
     begin
-        -- Pick slowest
-        for i in 0 to CYCLES-1 loop
-            wait for (SYSCLK_PERIOD/2); 
-            clk <= '1';
-            wait for (SYSCLK_PERIOD/2); 
-            clk <= '0';
-        end loop;
-        wait;
+        wait for (SYSCLK_PERIOD/2); 
+        i_clk <= '1';
+        wait for (SYSCLK_PERIOD/2); 
+        i_clk <= '0';
+    end process;
+    
+    i_in_proc : process
+        constant CLK_PERIOD  : time := 10 us; -- 100kHz
+    begin
+        wait for (CLK_PERIOD/2); 
+        i_in <= '1';
+        wait for (CLK_PERIOD/2); 
+        i_in <= '0';
     end process;
     
     pll_0 : entity work.pll
     port map(
-        i_clk => clk,
+        i_clk => i_clk,
         i_rst => '0',
-        i_in  => '0',
-        i_step => "0010",
-        o_out => led 
+        i_in  => i_in,
+        i_step => "0001",
+        o_out => o_led 
     );
    
 END tb;
