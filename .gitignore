@@ -3,10 +3,13 @@
 
 !rtl/
 !sim/
+!docs/
 
 !rtl/*.vhd
 !sim/*.vhd
 !sim/*.do
+!docs/*.pdf
 
 !.gitignore
 !hdl-prj.json
+!readme.md
