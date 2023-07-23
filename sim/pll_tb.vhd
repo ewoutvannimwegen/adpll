@@ -24,7 +24,7 @@ begin
     );
 
     i_clk_proc : process
-        constant SYSCLK_PERIOD  : time := 625 ns; -- 1600kHz
+        constant SYSCLK_PERIOD  : time := 390625 ps; -- 2.56MHz
     begin
         wait for (SYSCLK_PERIOD/2); 
         i_clk <= '1';
@@ -33,7 +33,7 @@ begin
     end process;
     
     i_in_proc : process
-        constant CLK_PERIOD  : time := 10 us; -- 100kHz
+        constant CLK_PERIOD  : time := 100 us; -- 10kHz
     begin
         wait for (CLK_PERIOD/2); 
         i_in <= '1';

@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity pll is
     generic (
-        RES : natural := 4
+        RES : natural := 8
     );
     port (
         i_clk        : in  std_logic;
@@ -26,7 +26,7 @@ begin
     o_out <= msb;
     err <= i_in xor msb; 
 
-    process(lvl) 
+    process(i_in, msb, lvl)
     begin
         if lvl = '1' then
             -- Leading if cnt goes low before i_in
@@ -37,11 +37,10 @@ begin
         end if;
     end process;
 
-    process(i_clk, i_rst, i_in, msb, lead, err)
+    process(i_clk, i_rst, i_in, i_step, msb, lead, err)
     begin
         if i_rst = '1' then
             cnt <= (others => '0');
-            lead <= '0';
             lvl <= '0';
         elsif rising_edge(i_clk) then
             if i_in = '1' and msb = '1' then
