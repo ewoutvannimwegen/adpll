@@ -21,7 +21,8 @@ begin
         i_clk => i_clk, 
         i_rst => i_rst,
         i_in  => i_in,
-        i_step => x"0D",
+        i_step => std_logic_vector(to_unsigned(13, 8)),
+        i_lgcoef => std_logic_vector(to_unsigned(0, 4)),
         o_out => o_led 
     );
 
@@ -46,9 +47,9 @@ begin
     pll_proc : process
     begin
         i_rst <= '1';
-        wait for 10 us;
+        wait for 77 us;
         i_rst <= '0';
-        wait for 10 us;
+        wait for 77 us;
         wait;
     end process;
 END tb;
