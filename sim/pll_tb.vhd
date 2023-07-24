@@ -14,16 +14,19 @@ architecture tb of pll_tb is
     signal o_led : std_logic := '0';
 begin
     pll_0 : entity work.pll
+    generic map(
+        RES => 16
+    )
     port map(
         i_clk => i_clk, 
         i_rst => i_rst,
         i_in  => i_in,
-        i_step => "0001",
+        i_step => x"0D",
         o_out => o_led 
     );
 
     i_clk_proc : process
-        constant T : time := 390.625 ns; -- 2.56MHz
+        constant T : time := 20 ns; -- 50MHz
     begin
         wait for (T/2); 
         i_clk <= '1';

@@ -9,25 +9,24 @@ The initial model will only try to replicate the phase of the input clock on the
 
 #### Calculations for the system clock frequency:
 
-Assumed that:
+$$f_{out} = \frac{step}{2^{RES}} * f_{clk} (=) step = \frac{f_{out} * 2^{RES}}{f_{clk}} $$
 
-$$ f_{in} = f_{out} $$
+$$ f_{in}=f_{out} = 10kHz, f_{clk} = 50MHz, RES=16 \Rightarrow $$
 
-$$f_{out} = \frac{step}{2^{RES}} * f_{clk} (=) $$ 
-$$f_{out} * 2^{RES} = step * f_{clk} (=) $$
-
-$$ f_{clk} = \frac{f_{out} * 2^{RES}}{step} $$
-
-$$ f_{in}=f_{out} = 10kHz, step = 1, RES=8 \Rightarrow $$
-
-$$ f_{clk} = \frac{10k * 2^8}{1} = 2.56MHz, T_{clk} = 390.625ns $$
+$$ step = \frac{10k * 2^{16}}{50M} \approx 13 $$
 
 #### Design notes: 
 
+- The step size must be larger than the correction value when leading. 
+If the step is smaller than the correction
+the clock is glitching. The clock will go back to its previous edge, to than 
+switch back to the current edge and so on.
+
 - The internal counter is based on signed 2's complement, this way only the MSB has to be checked and a duty cycle of 50 % is quaranteed, with a very small amount of logic. No <i>if statements</i> required which take a specific unsigned value of the number, to than reset the counter. Only downside is the loss of a single bit for the step size, this has to be a signed number.
 
-- If the step size is increased the system clock does not have to be very high. 
-- The system always has 1 clock cycle of inprecision which introduces error. If the resolution is increased, which results in a higher system clock frequency, the error will be reduced, the single cycle takes less time.
+- The system clock frequency should be the static variable, only the step size 
+can be varied to adjust to a new input frequency. The step size cannot always
+be an exact number, like in the example above, this will introduce some error.
 
 #### Upgrades
 

@@ -10,7 +10,7 @@ entity pll is
         i_clk        : in  std_logic;
         i_rst        : in  std_logic;
         i_in         : in  std_logic;
-        i_step       : in  std_logic_vector(3 downto 0); 
+        i_step       : in  std_logic_vector(7 downto 0); 
         o_out        : out std_logic  
     );
 end pll;
@@ -60,6 +60,7 @@ begin
                 cnt <= std_logic_vector(signed(cnt) + signed(i_step));
             elsif err = '1' and lead = '1' then
                 -- Cnt is leading i_in; Decrease speed
+                -- Avoid step < corr; This will result in clock glitching!
                 cnt <= std_logic_vector(signed(cnt) + signed(i_step) - 1);
             elsif err = '1' and lead = '0' then
                 -- Cnt is lagging behind i_in; Increase speed
