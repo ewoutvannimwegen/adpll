@@ -22,7 +22,7 @@ architecture bhv of pll is
     signal lvl  : std_logic                                    := '0'; -- 0 : low, 1 : high
     signal lead : std_logic                                    := '0'; -- 0 : lag, 1 : lead
     signal err  : std_logic                                    := '0'; -- Phase error
-    signal corr : std_logic_vector(i_lgcoef'length-1 downto 0) := (others => '0'); -- Correction  
+    signal corr : std_logic_vector(i_lgcoef'length-1 downto 0) := (others => '0'); -- Correction 
 begin
     msb   <= cnt(RES-1);
     err   <= i_in xor msb; -- 0 : coincide, 1 : leading or lagging
@@ -66,19 +66,17 @@ begin
             cnt <= (others => '0');
             corr <= (others => '0');
         elsif rising_edge(i_clk) then
-
             corr <= std_logic_vector(shift_left(to_unsigned(1, i_lgcoef'length), 
                     to_integer(unsigned(i_lgcoef))));
-
             if err = '0' then
                 -- Coincide
-                cnt <= std_logic_vector(signed(cnt) + signed(i_step));
+                cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step));
             elsif err = '1' and lead = '1' then
                 -- Leading 
-                cnt <= std_logic_vector(signed(cnt) + signed(i_step) - signed(corr));
+                cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step) - unsigned(corr));
             elsif err = '1' and lead = '0' then
                 -- Lagging
-                cnt <= std_logic_vector(signed(cnt) + signed(i_step) + signed(corr));
+                cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step) + unsigned(corr));
             else
                 null;
             end if; 
