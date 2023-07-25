@@ -2,16 +2,46 @@
 
 ## Background 
 
-Project to learn how to build a relatively simple Digital Phase Lock Loop
-(DPLL) on a FPGA. The digital part refers to the use of a digital implementation
+Project to learn how to build a relatively simple All Digital Phase Lock Loop
+(ADPLL) on a FPGA. The digital part refers to the use of a digital implementation
 of the Voltage Controlled Oscillator (VCO) (this is an analog component), 
 I've decided to use a Numerical Controlled Oscillator (NCO).
+
+The table below lists all PLL types:
+
+| Category         | Phase Detector    | Phase Error Signal | Loop Filter      |
+| ---------------- | ----------------- | ------------------ | ---------------- |
+| LPLL (Linear PLL)| Analog            | Analog             | Analog           |
+| DPLL (Digital PLL)| Digital           | Analog             | Analog           |
+| ADPLL (All Digital PLL)| Digital       | Digital            | Digital          |
+| SPLL (Software PLL)| Software         | Software           | Software         |
+
+I will focus on ADPLL's because they are easy to develop and scalable. 
+This project is somewhat serious, but mostly just to play around and learn some
+stuff here and there, so I don't want to get stuck in the complex analog 
+configuration playground.
+
 The Xilinx/AMD example uses a SPI-bus attached to a Digital to Analog Converter
 (DAC) to control a hardware VCO IC. I will use mainly VHDL-1993 (no fancy
 VHDL-2008 tricks are used) to practice for
 my study program, but using Verilog is probably easier here. The ZipCPU 
 designer has some great verification scripts which use Verilator, a Verilog/
 System Verilog only simulator.
+
+Building blocks and how I use them:
+
+- Phase Detector (PD): detects the phase of the incoming clock signal and
+determines if the generated output coincides, leads or lags compared to the 
+incoming signal.
+- Low Pass Filter (LPF): not implemented
+- Voltage Controlled Oscillator (VCO): not implemented
+- Numerical Controlled Oscillator (NCO): sort of implemented, I use the 
+original square wave as output signal. The main purpose of a NCO is to 
+make a 'new' signal like a sine wave.
+
+I've implemented the PD and NCO in a single block, both barely use any
+logic, keeping them in the same file allows easy readability and understanding
+of the logic for beginners.
 
 ```text
              |----|    |-----|    
@@ -127,3 +157,4 @@ error, but ONLY steady fixed error.
 - [2's complement Ben Eater video](https://www.youtube.com/watch?v=4qH4unVtJkE)
 - [NCO wikipedia](https://en.wikipedia.org/wiki/Numerically_controlled_oscillator)
 - [PLL example](https://github.com/filipamator/adpll)
+- [Types of PLL's](https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/application-notes/AN575.pdf)

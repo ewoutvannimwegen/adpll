@@ -42,7 +42,7 @@ begin
                 lvl <= '0';
             else
                 -- Leading or lagging
-                null;
+                lvl <= lvl;
             end if;
         end if;
     end process;
@@ -78,7 +78,7 @@ begin
                 -- Lagging
                 cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step) + unsigned(corr));
             else
-                null;
+                cnt <= cnt;
             end if; 
         end if;
     end process;
