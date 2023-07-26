@@ -8,6 +8,10 @@
     },
     "files": [
         { "file": "rtl/pll.vhd",                       "language": "vhdl" },
-        { "file": "sim/pll_tb.vhd",                       "language": "vhdl" }
+        { "file": "rtl/pfd.vhd",                       "language": "vhdl" },
+        { "file": "rtl/pfdv2.vhd",                       "language": "vhdl" },
+        { "file": "sim/pll_tb.vhd",                       "language": "vhdl" },
+        { "file": "sim/pfd_tb.vhd",                       "language": "vhdl" },
+        { "file": "sim/pdfv2_tb.vhd",                       "language": "vhdl" }
     ]
 }
