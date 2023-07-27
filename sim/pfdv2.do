@@ -6,10 +6,14 @@ add wave -noupdate /pfdv2_tb/pfdv2_0/i_clk
 add wave -noupdate /pfdv2_tb/pfdv2_0/i_ref
 add wave -noupdate /pfdv2_tb/pfdv2_0/i_fb
 add wave -noupdate /pfdv2_tb/pfdv2_0/rst
-add wave -noupdate -radix unsigned /pfdv2_tb/pfdv2_0/o_up
-add wave -noupdate -radix unsigned /pfdv2_tb/pfdv2_0/o_dn
+add wave -noupdate -radix unsigned /pfdv2_tb/pfdv2_0/up_cnt
+add wave -noupdate -radix unsigned /pfdv2_tb/pfdv2_0/dn_cnt
+add wave -noupdate -radix decimal /pfdv2_tb/o_err
+add wave -noupdate /pfdv2_tb/pfdv2_0/lvl
+add wave -noupdate /pfdv2_tb/pfdv2_0/lead
+add wave -noupdate /pfdv2_tb/pfdv2_0/err
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {134763306 ps} 0}
+WaveRestoreCursors {{Cursor 1} {620165 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -25,4 +29,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {131962584 ps} {155197144 ps}
+WaveRestoreZoom {0 ps} {5808640 ps}

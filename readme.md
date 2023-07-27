@@ -158,3 +158,5 @@ error, but ONLY steady fixed error.
 - [NCO wikipedia](https://en.wikipedia.org/wiki/Numerically_controlled_oscillator)
 - [PLL example](https://github.com/filipamator/adpll)
 - [Types of PLL's](https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/application-notes/AN575.pdf)
+- [Digital Subsampling Phase Lock Techniques for Frequency Synthesis and Polar Transmission ](https://link-springer-com.ezproxy2.utwente.nl/book/10.1007/978-3-030-10958-5)
+- [ADPLL matlab/simulink](https://nl.mathworks.com/help/msblks/ug/digital-phase-locked-loop.html)
