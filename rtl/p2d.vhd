@@ -11,6 +11,7 @@ entity p2d is
         i_clk : in  std_logic;                     -- System clock
         i_rf  : in  std_logic;                     -- Reference clock
         i_fb  : in  std_logic;                     -- Feedback clock
+        i_rst : in  std_logic;                     -- Reset
         o_er  : out std_logic_vector(R-1 downto 0) -- Error
     );
 end p2d;
@@ -23,10 +24,11 @@ architecture bhv of p2d is
     -- Phase Frequency Detector
     component pfd is
     port (
-        i_rf : in  std_logic; -- Reference clock
-        i_fb : in  std_logic; -- Feedback clock
-        o_up : out std_logic; -- Up pulse
-        o_dn : out std_logic  -- Down pulse
+        i_rf  : in  std_logic; -- Reference clock
+        i_fb  : in  std_logic; -- Feedback clock
+        i_rst : in  std_logic; -- Reset
+        o_up  : out std_logic; -- Up pulse
+        o_dn  : out std_logic  -- Down pulse
     );
     end component;
    
@@ -36,9 +38,10 @@ architecture bhv of p2d is
         L : natural := 7 -- Resolution absolute error 
     );
     port (
-        i_rf : in std_logic;                      -- Reference clock
-        i_ep : in std_logic;                      -- Error pulse
-        o_ab : out std_logic_vector(L-1 downto 0) -- Absolute error 
+        i_rf  : in  std_logic;                     -- Reference clock
+        i_rst : in  std_logic;                     -- Reset
+        i_ep  : in  std_logic;                     -- Error pulse
+        o_ab  : out std_logic_vector(L-1 downto 0) -- Absolute error 
     );
     end component;
 
@@ -53,10 +56,11 @@ begin
     -- Phase Frequency Detector
     pfd_0 : pfd
     port map(
-        i_rf => i_rf,
-        i_fb => i_fb,
-        o_up => up,
-        o_dn => dn
+        i_rf  => i_rf,
+        i_fb  => i_fb,
+        i_rst => i_rst,
+        o_up  => up,
+        o_dn  => dn
     );
 
     -- Time Digital Converter
@@ -65,31 +69,36 @@ begin
         L => R-1
     )
     port map(
-        i_rf => i_clk,
-        i_ep => ep,
-        o_ab => ab    
+        i_rf  => i_clk,
+        i_rst => i_rst,
+        i_ep  => ep,
+        o_ab  => ab    
     );
 
     ep <= up or dn; -- Construct the error pulse 
 
     -- Determine the sign of the error
-    process(dn) 
+    process(i_rst, dn) 
     begin
-        if rising_edge(dn) then
+        if i_rst = '1' then
+            sign <= '0';
+        elsif rising_edge(dn) then
             sign <= up;
+        else
+            sign <= sign;
         end if;
     end process;
 
     -- Construct the digital error value
     process(sign, ab) 
-        variable er : std_logic_vector(R-1 downto 0) := (others => '0'); -- Error
     begin
-        er(R-2 downto 0) := ab;
         if sign = '1' then
-            -- Negative number 
-            er := std_logic_vector(signed(not er) + 1); -- 2's comp inverse
+            -- Negative 
+            o_er <= std_logic_vector(signed(not ('0' & ab)) + 1); -- 2's comp inverse
+        else 
+            -- Positive
+            o_er <= '0' & ab;
         end if;
-        o_er <= er;
     end process;
 
 end bhv;

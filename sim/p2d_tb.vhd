@@ -13,6 +13,7 @@ architecture tb of p2d_tb is
     signal i_clk : std_logic := '0';
     signal i_rf  : std_logic := '0';
     signal i_fb  : std_logic := '0';
+    signal i_rst : std_logic := '0';
     signal o_er  : std_logic_vector(R-1 downto 0) := (others => '0');
 begin
     p2d_0 : entity work.p2d
@@ -23,6 +24,7 @@ begin
         i_clk => i_clk,
         i_rf  => i_rf,
         i_fb  => i_fb,
+        i_rst => i_rst,
         o_er  => o_er
     );
 

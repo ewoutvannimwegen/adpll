@@ -5,10 +5,11 @@ use ieee.numeric_std.all;
 -- Phase Frequency Detector
 entity pfd is
     port (
-        i_rf : in  std_logic; -- Reference clock
-        i_fb : in  std_logic; -- Feedback clock
-        o_up : out std_logic; -- Up pulse 
-        o_dn : out std_logic  -- Down pulse
+        i_rf  : in  std_logic; -- Reference clock
+        i_fb  : in  std_logic; -- Feedback clock
+        i_rst : in  std_logic; -- Reset
+        o_up  : out std_logic; -- Up pulse 
+        o_dn  : out std_logic  -- Down pulse
     );
 end pfd;
 
@@ -25,9 +26,9 @@ begin
     o_up <= up;
     o_dn <= dn;
     rst  <= up and dn; -- Reset if rf & fb coincide at logic high
-    process(rst, i_rf, i_fb)
+    process(i_rst, rst, i_rf, i_fb)
     begin
-        if rst = '1' then
+        if i_rst = '1' or rst = '1' then
             up <= '0';
             dn <= '0';
         else 

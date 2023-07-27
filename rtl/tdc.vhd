@@ -9,6 +9,7 @@ entity tdc is
     );
     port (
         i_rf  : in std_logic;                      -- Reference clock
+        i_rst : in std_logic;                      -- Reset
         i_ep  : in std_logic;                      -- Error pulse
         o_ab  : out std_logic_vector(L-1 downto 0) -- Absolute error
     );
@@ -21,8 +22,11 @@ architecture bhv of tdc is
     signal cnt : std_logic_vector(L-1 downto 0) := (others => '0');
 begin
     o_ab <= cnt;
-    process(i_rf) begin
-        if rising_edge(i_rf) then
+    process(i_rst, i_rf) begin
+        if i_rst = '1' then
+            cnt <= (others => '0');
+            lvl <= '0';
+        elsif rising_edge(i_rf) then
             if lvl = '0' then
                 if i_ep = '1' then
                     -- Lead/lag detected
