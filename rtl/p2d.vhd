@@ -12,6 +12,7 @@ entity p2d is
         i_rf  : in  std_logic;                     -- Reference clock
         i_fb  : in  std_logic;                     -- Feedback clock
         i_rst : in  std_logic;                     -- Reset
+        o_vld : out std_logic;                     -- Valid error
         o_er  : out std_logic_vector(R-1 downto 0) -- Error
     );
 end p2d;
@@ -41,6 +42,7 @@ architecture bhv of p2d is
         i_rf  : in  std_logic;                     -- Reference clock
         i_rst : in  std_logic;                     -- Reset
         i_ep  : in  std_logic;                     -- Error pulse
+        o_vld : out std_logic;                     -- Valid error
         o_ab  : out std_logic_vector(L-1 downto 0) -- Absolute error 
     );
     end component;
@@ -72,6 +74,7 @@ begin
         i_rf  => i_clk,
         i_rst => i_rst,
         i_ep  => ep,
+        o_vld => o_vld,
         o_ab  => ab    
     );
 
