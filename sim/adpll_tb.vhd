@@ -8,7 +8,7 @@ entity adpll_tb is
 end adpll_tb;
 
 architecture tb of adpll_tb is
-    constant R : natural := 8;
+    constant R : natural := 9;
 
     signal i_clk : std_logic := '0';
     signal i_rf  : std_logic := '0';
@@ -39,7 +39,7 @@ begin
     end process;
 
     i_rf_proc : process
-        constant T : time := 1 us; -- 1MHz
+        constant T : time := 1200 ns; -- 833kHz
     begin
         wait for (T/4);
         for i in 0 to 100 loop
