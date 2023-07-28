@@ -41,6 +41,7 @@ begin
     i_rf_proc : process
         constant T : time := 1 us; -- 1MHz
     begin
+        wait for (T/4);
         for i in 0 to 100 loop
             wait for (T/2); 
             i_rf <= '1';

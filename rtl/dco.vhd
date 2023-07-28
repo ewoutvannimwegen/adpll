@@ -25,14 +25,17 @@ begin
     o_gen <= cnt(R-1); -- Generate clock based on MSB of internal counter
 
     -- Absolute of phase error
+    -- Phase error is in cycles, multiply by steps per cycle!
     process(i_pe) 
     begin
         if i_pe(R-1) = '1' then
             -- Negative
-            ab <= std_logic_vector(signed(not i_pe) + 1); -- 2's comp inverse
+            ab <= std_logic_vector(resize(unsigned(
+                  std_logic_vector(signed(not i_pe) + 1) -- 2's comp inverse
+              ) * unsigned(i_step), ab'length));         -- Cycles * step size
         else 
             -- Positive
-            ab <= i_pe;
+            ab <= std_logic_vector(resize(unsigned(i_pe) * unsigned(i_step), ab'length)); -- Cycles * step size
         end if;
     end process;
 
@@ -40,29 +43,34 @@ begin
     begin
         if i_rst = '1' then
             cnt <= (others => '0');
-            cor <= '0';
+            cor <= '1';
         elsif rising_edge(i_clk) then
-            if i_vld = '1' and cor = '0' then
-                -- Valid phase error
-                if i_pe(R-1) = '1' then
-                    -- Lagging
-                    cnt <= std_logic_vector(unsigned(cnt) + unsigned(ab) + 
-                            unsigned(i_step));
-                else
-                    -- Leading
-                    if ab > i_step then
-                        -- Avoid clock glitch
-                        cnt <= cnt;
+            if i_vld = '1'  then
+                -- Phase error valid
+                if cor = '1' then
+                    -- Correct phase
+                    if i_pe(R-1) = '1' then
+                        -- Lagging; Speed up
+                        cnt <= std_logic_vector(unsigned(cnt) + unsigned(ab) + unsigned(i_step));
+                        cor <= '0'; 
                     else
-                        cnt <= std_logic_vector(unsigned(cnt) - unsigned(ab) + 
-                               unsigned(i_step));
+                        -- Leading; Slow down
+                        if unsigned(cnt) < unsigned(ab) then
+                            -- Clock glitch
+                            cnt <= cnt;
+                        else
+                            cnt <= std_logic_vector(unsigned(cnt) - unsigned(ab) + unsigned(i_step));
+                            cor <= '0'; 
+                        end if;
                     end if;
+                else
+                    -- Phase already corrected
+                    cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step));
                 end if;
-                cor <= '1'; -- Correction applied
             else
-                -- Invalid phase error
+                -- Phase error invalid
                 cnt <= std_logic_vector(unsigned(cnt) + unsigned(i_step));
-                cor <= '0'; -- Allow correction
+                cor <= '1'; -- Allow new phase correction
             end if;
         end if;
     end process;
