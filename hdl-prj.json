@@ -13,8 +13,11 @@
         { "file": "rtl/p2d.vhd",                       "language": "vhdl" },
         { "file": "rtl/dco.vhd",                       "language": "vhdl" },
         { "file": "rtl/adpll.vhd",                       "language": "vhdl" },
+        { "file": "rtl/tff.vhd",                       "language": "vhdl" },
+        { "file": "rtl/cntr.vhd",                       "language": "vhdl" },
         { "file": "sim/pll_tb.vhd",                       "language": "vhdl" },
         { "file": "sim/p2d_tb.vhd",                       "language": "vhdl" },
-        { "file": "sim/adpll_tb.vhd",                       "language": "vhdl" }
+        { "file": "sim/adpll_tb.vhd",                       "language": "vhdl" },
+        { "file": "sim/cntr_tb.vhd",                       "language": "vhdl" }
     ]
 }

@@ -17,20 +17,21 @@ entity dco is
     );
 end dco;
 
--- Use step coefficient instead of direct step size to avoid using mulitiplications
+-- Use of the step coefficient instead of direct step size to avoid using mulitiplications
+-- After finding a valid phase error the correction is only applied once.
 architecture bhv of dco is
-    signal cnt : std_logic_vector(R-1 downto 0) := (others => '0');
-    signal ab  : std_logic_vector(R-1 downto 0) := (others => '0');
-    signal cor : std_logic := '0'; -- Phase correction 
-    signal step : std_logic_vector(3 downto 0) := (others => '0');
+    signal cnt  : std_logic_vector(R-1 downto 0) := (others => '0'); -- Internal counter
+    signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error in steps
+    signal cor  : std_logic := '0';                                  -- Phase correction flag
+    signal step : std_logic_vector(3 downto 0) := (others => '0');   -- Step size 
 begin
     o_gen <= cnt(R-1); -- Generate clock based on MSB of internal counter
 
     -- Step size = 1 << step coefficient
-    step  <= std_logic_vector(shift_left(to_unsigned(1, i_step'length), 
+    step <= std_logic_vector(shift_left(to_unsigned(1, i_step'length), 
              to_integer(unsigned(i_step))));
 
-    -- Absolute of phase error
+    -- Convert phase error in cycles to ABS in steps
     -- Phase error is in cycles, multiply by steps per cycle!
     process(i_pe) 
     begin
@@ -55,7 +56,7 @@ begin
             if i_vld = '1'  then
                 -- Phase error valid
                 if cor = '1' then
-                    -- Correct phase
+                    -- Phase not yet corrected 
                     if i_pe(R-1) = '1' then
                         -- Lagging; Speed up
                         cnt <= std_logic_vector(unsigned(cnt) + unsigned(ab) + 
@@ -67,6 +68,7 @@ begin
                             -- Clock glitch
                             cnt <= cnt;
                         else
+                            -- No clock glitch
                             cnt <= std_logic_vector(unsigned(cnt) - unsigned(ab) + 
                                    unsigned(step));
                             cor <= '0'; 
