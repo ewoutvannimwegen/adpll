@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
--- T-Flipflop
+-- Counter
 -- https://www.fpga4fun.com/Counters4.html
 entity cntr is
     generic (
@@ -37,7 +37,7 @@ begin
             i_in  => di(i),
             o_out => do(i) 
         );
-    
+
         i_1 : if i = 1 generate
             di(1) <= do(0);
         end generate;
@@ -49,7 +49,6 @@ begin
         carry_chain : if i >= 3 generate
             di(i) <= do(i-1) and di(i-1);
         end generate;
-
     end generate;
 
     di(0) <= i_in;
