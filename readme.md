@@ -23,3 +23,4 @@ PLL types:
 - [Overview PLL types](https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/application-notes/AN575.pdf)
 - [Digital Subsampling Phase Lock Techniques for Frequency Synthesis and Polar Transmission ](https://link-springer-com.ezproxy2.utwente.nl/book/10.1007/978-3-030-10958-5)
 - [ADPLL Matlab/Simulink model](https://nl.mathworks.com/help/msblks/ug/digital-phase-locked-loop.html)
+- [TDC docs/implementation TU Delft](https://sps.ewi.tudelft.nl/fpga_tdc/TDC_basic.html)
