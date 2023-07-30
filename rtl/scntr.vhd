@@ -11,7 +11,7 @@ use unisim.vcomponents.all;
 -- CARRY4 : https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/CARRY4
 entity scntr is
     generic (
-        R : natural := 16 -- Resolution
+        R : natural := 256 -- Resolution
     );
 	port (
 		i_clk : in  std_logic;                     -- System clock

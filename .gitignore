@@ -4,8 +4,8 @@
 !rtl/
 !sim/
 
-!rtl/*.vhd
-!sim/*.vhd
+!rtl/*.v*
+!sim/*.v*
 !sim/*.do
 
 !.gitignore

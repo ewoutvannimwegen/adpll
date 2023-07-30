@@ -5,7 +5,7 @@ use ieee.std_logic_1164.all;
 -- https://www.fpga4fun.com/Counters4.html
 entity cntr is
     generic (
-        R : natural := 4 -- Resolution
+        R : natural := 16 -- Resolution
     );
 	port (
 		i_clk : in  std_logic;                     -- System clock

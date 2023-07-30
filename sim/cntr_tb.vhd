@@ -8,17 +8,12 @@ entity cntr_tb is
 end cntr_tb;
 
 architecture tb of cntr_tb is
-    constant R : natural := 16;
-
     signal i_clk : std_logic := '0';
     signal i_rst : std_logic := '0';
-    signal cntr_o_out : std_logic_vector(R-1 downto 0) := (others => '0');
-    signal scntr_o_out : std_logic_vector(R-1 downto 0) := (others => '0');
+    signal cntr_o_out : std_logic_vector(15 downto 0) := (others => '0');
+    signal scntr_o_out : std_logic_vector(15 downto 0) := (others => '0');
 begin
     cntr_0 : entity work.cntr
-    generic map (
-        R => R
-    )
     port map(
         i_clk => i_clk,
         i_rst => i_rst,
@@ -27,9 +22,6 @@ begin
     );
     
     scntr_0 : entity work.scntr
-    generic map (
-        R => R
-    )
     port map(
         i_clk => i_clk,
         i_rst => i_rst,
