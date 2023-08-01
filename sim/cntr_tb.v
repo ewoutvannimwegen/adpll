@@ -8,6 +8,7 @@ module cntr_tb();
     reg i_clk = 1'b0;
     reg i_rst = 1'b0;
     reg i_in  = 1'b0;
+    reg i_en  = 1'b0;
 
     wire [3:0] o_out;
     
@@ -15,6 +16,7 @@ module cntr_tb();
         .i_clk(i_clk),
         .i_rst(i_rst),
         .i_in(i_in),
+        .i_en(i_en),
         .o_out(o_out)
     );
 
@@ -28,11 +30,32 @@ module cntr_tb();
         #100;
 
         i_in = 1'b1;
+        i_en = 1'b1;
 
-        for (i = 0; i < 4; i = i + 1) begin
+        for (i = 0; i < 10; i = i + 1) begin
             @(posedge i_clk);
         end 
        
+        i_rst = 1'b1;
+        i_en = 1'b0;
         i_in = 1'b0;
+
+        // Allow chain to clear its self
+        // FF's clear quick, but MUX chain takes quiet a while!
+        #200;
+
+        i_rst = 1'b0;
+        i_in = 1'b1;
+        i_en = 1'b1;
+        
+        for (i = 0; i < 10; i = i + 1) begin
+            @(posedge i_clk);
+        end 
+      
+        i_in = 1'b0;
+        i_en = 1'b0;
+
+        #20;
+        $stop; 
     end 
 endmodule

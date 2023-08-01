@@ -3,6 +3,8 @@ library unisim;
 use ieee.std_logic_1164.all;
 use unisim.vcomponents.all;
 use ieee.math_real.all;
+use work.common.all;
+use ieee.numeric_std.all;
 
 -- Shift Counter
 -- Tracks the distance i_in can travel in the phase difference
@@ -16,16 +18,22 @@ entity scntr is
 		i_clk : in  std_logic;                    -- System clock
         i_rst : in  std_logic;                    -- Reset
 		i_in  : in  std_logic;                    -- Input data
+        i_en  : in  std_logic;                    -- Enable 
 		o_out : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0)  -- Output data
 	);
 end scntr;
 
 -- Carry chain is implemented with Xilinx/AMD CARRY4 blocks
--- N carry chain outputs are attached to a FF
+-- N number of carry chain outputs which are 'measured' by a FF
+-- i_en is used to disable the FF's after the pulse has ended
 architecture bhv of scntr is
 
 	attribute keep_hierarchy : string;
 	attribute dont_touch : string;
+    attribute loc : string;
+
+    -- Keep hierarchy to have the chain set up as a tower (not spread out by vivado), 
+    -- this way the prop. delay is the same between each CARRY4 element
     attribute keep_hierarchy of bhv : architecture is "true";
 
     component CARRY4 
@@ -38,19 +46,21 @@ architecture bhv of scntr is
             O : out std_logic_vector(3 downto 0)
         );
     end component CARRY4;
-    
+   
+    -- Avoid optimizing the carries out, who are not attached to a FF
     attribute dont_touch of CARRY4 : component is "true";
 
+    -- Data-FF with enable 
     component FDCE
         generic (
-            INIT : std_logic := '0'
+            INIT : std_logic := '0' 
         );
         port (
-            CLR : in std_logic;
-            CE : in std_logic;
-            D : in std_logic;
-            C : in std_logic;
-            Q : out std_logic
+            CLR : in std_logic; -- Clear
+            CE : in std_logic; -- Enable
+            D : in std_logic; -- Data in
+            C : in std_logic; -- Clock
+            Q : out std_logic -- Data out
         );
     end component FDCE;
 
@@ -75,11 +85,16 @@ architecture bhv of scntr is
     signal di : std_logic_vector(L-1 downto 0) := (others => '0'); -- MUX out
     signal do : std_logic_vector(N-1 downto 0) := (others => '0'); -- FF out
 
+    constant xoff : integer := 8; 
+    constant yoff : integer := 12;
+
 begin
     gen_carry4_inst : for i in 0 to L/4-1 generate
         -- CARRY4 : https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/CARRY4
         gen_carry4_inst_0 : if i = 0 generate
-
+            attribute loc of carry4_inst_0 : label is "SLICE_X" & 
+                integer'image(xoff) & "Y" & integer'image(yoff+i);
+        begin
             carry4_inst_0 : CARRY4
             port map (
                 CO     => di(3 downto 0),
@@ -90,7 +105,11 @@ begin
             );
         end generate;
 
+
         gen_carry4_inst_i : if i > 0 generate
+            attribute loc of carry4_inst_i : label is "SLICE_X" & 
+                integer'image(xoff) & "Y" & integer'image(yoff+i);
+        begin
             carry4_inst_i : CARRY4
             port map (
                 CO     => di(4*(i+1)-1 downto 4*i),
@@ -100,6 +119,7 @@ begin
                 S      => "1111"
             );
         end generate;
+        
     end generate;
 
     
@@ -113,7 +133,7 @@ begin
             CLR => i_rst,
             D  => di(i*off+off-1),
             Q => do(i),
-            CE => '1'
+            CE => i_en
         );
     end generate;
     
