@@ -3,12 +3,13 @@
 module cntr_tb();
 
     localparam T = 20; // 50MHz
+    integer i;
 
     reg i_clk = 1'b0;
     reg i_rst = 1'b0;
     reg i_in  = 1'b0;
 
-    wire [1023:0] scntr_o_out;
+    wire [511:0] scntr_o_out;
     
     scntr scntr_0 (
         .i_clk(i_clk),
@@ -23,12 +24,15 @@ module cntr_tb();
     end
 
     initial begin
-        i_rst = 1'b1;
-        i_in = 1'b0;
-        @(posedge i_clk);
-        i_rst = 1'b0;
-        @(posedge i_clk);
-        i_in = 1'b1;
-    end 
+        // Wait till all D-FF's are set to initial value
+        #100;
 
+        i_in = 1'b1;
+
+        for (i = 0; i < 4; i = i + 1) begin
+            @(posedge i_clk);
+        end 
+       
+        i_in = 1'b0;
+    end 
 endmodule

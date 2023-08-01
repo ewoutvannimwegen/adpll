@@ -7,6 +7,7 @@
         ]
     },
     "files": [
+        { "file": "rtl/common.vhd",                       "language": "vhdl" },
         { "file": "rtl/pll.vhd",                       "language": "vhdl" },
         { "file": "rtl/pfd.vhd",                       "language": "vhdl" },
         { "file": "rtl/tdc.vhd",                       "language": "vhdl" },
