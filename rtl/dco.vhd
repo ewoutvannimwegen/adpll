@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
-
+use work.common.all;
 -- Digital Controlled Oscillator
 entity dco is
     generic(
@@ -33,7 +33,7 @@ begin
 
     -- Convert phase error in cycles to ABS in steps
     -- Phase error is in cycles, multiply by steps per cycle!
-    process(i_pe) 
+    process(i_pe, i_step) 
     begin
         if i_pe(R-1) = '1' then
             -- Negative
@@ -61,19 +61,25 @@ begin
                         -- Lagging; Speed up
                         cnt <= std_logic_vector(unsigned(cnt) + unsigned(ab) + 
                                unsigned(step));
-                        cor <= '0'; 
                     else
                         -- Leading; Slow down
-                        if unsigned(cnt) < unsigned(ab) then
+                        if cnt(R-1) = '1' and ((unsigned(cnt)-(2**cnt'length)/2) < unsigned(ab)) then
+                            -- Clock glitch
+                            cnt <= cnt;
+                        elsif cnt(R-1) = '0' and (unsigned(cnt) < unsigned(ab)) then
                             -- Clock glitch
                             cnt <= cnt;
                         else
+                            assert false report "cnt|" & to_string(cnt) & "|ab|" & 
+                                to_string(ab) & "|cnt high|" & 
+                                to_string(std_logic_vector(to_unsigned(
+                                2**cnt'length-1, cnt'length))) severity note;
                             -- No clock glitch
                             cnt <= std_logic_vector(unsigned(cnt) - unsigned(ab) + 
                                    unsigned(step));
-                            cor <= '0'; 
                         end if;
                     end if;
+                    cor <= '0';
                 else
                     -- Phase already corrected
                     cnt <= std_logic_vector(unsigned(cnt) + unsigned(step));

@@ -54,9 +54,6 @@ architecture bhv of scntr is
     -- Data-FF with clock enable and async clear
     -- https://docs.xilinx.com/r/en-US/ug974-vivado-ultrascale-libraries/FDCE
     component FDCE
-        generic (
-            INIT : std_logic := '0' 
-        );
         port (
             CLR : in std_logic; -- Clear
             CE : in std_logic; -- Enable
@@ -128,9 +125,6 @@ begin
 
     gen_fdce_inst : for i in 0 to N-1 generate
         fdce_inst_i : FDCE
-        generic map(
-            INIT => '0' 
-        )
         port map (
             C => i_clk,
             CLR => i_rst,

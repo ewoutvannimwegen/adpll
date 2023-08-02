@@ -75,7 +75,7 @@ begin
     port map(
         i_clk  => i_clk,
         i_rst  => i_rst,
-        i_step => x"3",
+        i_step => x"2",
         i_pe   => pe,
         i_vld  => vld,
         o_gen  => fb
