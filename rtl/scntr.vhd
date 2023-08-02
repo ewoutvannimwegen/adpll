@@ -15,11 +15,12 @@ entity scntr is
         N : natural := 16   -- Number of FF
     );
 	port (
-		i_clk : in  std_logic;                    -- System clock
-        i_rst : in  std_logic;                    -- Reset
-		i_in  : in  std_logic;                    -- Input data
-        i_en  : in  std_logic;                    -- Enable 
-		o_out : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0)  -- Output data
+		i_clk  : in  std_logic;                    -- System clock
+        i_rst  : in  std_logic;                    -- Reset
+		i_in   : in  std_logic;                    -- Input data
+        i_en   : in  std_logic;                    -- Enable 
+		o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0);  -- Output data
+        o_flw  : out std_logic -- Overflow
 	);
 end scntr;
 
@@ -50,7 +51,8 @@ architecture bhv of scntr is
     -- Avoid optimizing the carries out, who are not attached to a FF
     attribute dont_touch of CARRY4 : component is "true";
 
-    -- Data-FF with enable 
+    -- Data-FF with clock enable and async clear
+    -- https://docs.xilinx.com/r/en-US/ug974-vivado-ultrascale-libraries/FDCE
     component FDCE
         generic (
             INIT : std_logic := '0' 
@@ -85,12 +87,14 @@ architecture bhv of scntr is
     signal di : std_logic_vector(L-1 downto 0) := (others => '0'); -- MUX out
     signal do : std_logic_vector(N-1 downto 0) := (others => '0'); -- FF out
 
-    constant xoff : integer := 8; 
-    constant yoff : integer := 12;
+    -- Take a look at the 'device map' in Vivado after synthesis to find a good spot
+    constant xoff : integer := 43; 
+    constant yoff : integer := 0;
 
 begin
     gen_carry4_inst : for i in 0 to L/4-1 generate
         -- CARRY4 : https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/CARRY4
+        -- Location constraint : https://www.xilinx.com/htmldocs/xilinx14_7/cgd.pdf
         gen_carry4_inst_0 : if i = 0 generate
             attribute loc of carry4_inst_0 : label is "SLICE_X" & 
                 integer'image(xoff) & "Y" & integer'image(yoff+i);
@@ -122,7 +126,6 @@ begin
         
     end generate;
 
-    
     gen_fdce_inst : for i in 0 to N-1 generate
         fdce_inst_i : FDCE
         generic map(
@@ -144,8 +147,10 @@ begin
     port map (
         i_clk => i_clk,
         i_rst => i_rst,
-        i_in => do(N-1 downto 1),
+        i_in => do(N-2 downto 0),
         o_out => o_out 
     );
+    
+    o_flw <= do(N-1);
 
 end bhv;

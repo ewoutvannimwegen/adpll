@@ -11,13 +11,15 @@ module cntr_tb();
     reg i_en  = 1'b0;
 
     wire [3:0] o_out;
+    wire       o_flw; 
     
     scntr scntr_0 (
         .i_clk(i_clk),
         .i_rst(i_rst),
         .i_in(i_in),
         .i_en(i_en),
-        .o_out(o_out)
+        .o_out(o_out),
+        .o_flw(o_flw)
     );
 
     always begin
@@ -29,6 +31,7 @@ module cntr_tb();
         // Wait till all D-FF's are set to initial value
         #100;
 
+        @(posedge i_clk);
         i_in = 1'b1;
         i_en = 1'b1;
 
@@ -44,6 +47,7 @@ module cntr_tb();
         // FF's clear quick, but MUX chain takes quiet a while!
         #200;
 
+        @(posedge i_clk);
         i_rst = 1'b0;
         i_in = 1'b1;
         i_en = 1'b1;
