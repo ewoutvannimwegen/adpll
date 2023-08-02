@@ -3,7 +3,7 @@
 module adpll_tb();
 
     localparam T_CLK = 20; // 50MHz
-    localparam T_RF = 1200; // 833kHz
+    localparam T_RF = 1190; // 840kHz
     integer i, j;
 
     reg i_clk = 1'b0;

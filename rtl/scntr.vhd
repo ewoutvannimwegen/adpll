@@ -11,14 +11,13 @@ use ieee.numeric_std.all;
 -- NOTE: Uses the prop. delay through the MUX as delay. Gate level sim required
 entity scntr is
     generic (
-        L : natural := 512; -- Lenght carry chain
+        L : natural := 64; -- Lenght carry chain
         N : natural := 16   -- Number of FF
     );
 	port (
 		i_clk  : in  std_logic;                    -- System clock
         i_rst  : in  std_logic;                    -- Reset
 		i_in   : in  std_logic;                    -- Input data
-        i_en   : in  std_logic;                    -- Enable 
 		o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0);  -- Output data
         o_flw  : out std_logic -- Overflow
 	);
@@ -26,7 +25,6 @@ end scntr;
 
 -- Carry chain is implemented with Xilinx/AMD CARRY4 blocks
 -- N number of carry chain outputs which are 'measured' by a FF
--- i_en is used to disable the FF's after the pulse has ended
 architecture bhv of scntr is
 
 	attribute keep_hierarchy : string;
@@ -130,7 +128,7 @@ begin
             CLR => i_rst,
             D  => di(i*off+off-1),
             Q => do(i),
-            CE => i_en
+            CE => '1'
         );
     end generate;
     

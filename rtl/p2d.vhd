@@ -35,44 +35,28 @@ architecture bhv of p2d is
     );
     end component;
    
-    -- Time Digital Converter
-    component tdc is
-    generic (
-        L : natural := 7 -- Resolution absolute error 
-    );
-    port (
-        i_rf  : in  std_logic;                     -- Reference clock
-        i_rst : in  std_logic;                     -- Reset
-        i_ep  : in  std_logic;                     -- Error pulse
-        o_vld : out std_logic;                     -- Valid error
-        o_ab  : out std_logic_vector(L-1 downto 0) -- Absolute error 
-    );
-    end component;
-    
     -- Shift counter
     component scntr is
     generic (
-        L : natural := 512; -- Length carry chain
+        L : natural := 64; -- Length carry chain
         N : natural := N   -- Number of FF's; Currently only 16 is supported!
     );
     port (
         i_clk  : in  std_logic;                     -- Reference clock
         i_rst : in  std_logic;                     -- Reset
         i_in  : in  std_logic;                     -- Input data
-        i_en : in std_logic;                     -- Enable
         o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0); -- Absolute error 
         o_flw : out std_logic  -- Overflow
     );
     end component;
 
-    signal up   : std_logic := '0';                                  -- Up pulse
-    signal dn   : std_logic := '0';                                  -- Down pulse
-    signal sign : std_logic := '0';                                  -- Error sign
-    signal ep   : std_logic := '0';                                  -- Error pulse
-    signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute error
-    signal vld  : std_logic := '0';
-    
-    signal en   : std_logic := '0';
+    signal up   : std_logic := '0'; -- Up pulse
+    signal dn   : std_logic := '0'; -- Down pulse
+    signal sign : std_logic := '0'; -- Error sign
+    signal ep   : std_logic := '0'; -- Error pulse
+    signal lvl  : std_logic := '0'; -- Logic level last coincide
+    signal vld  : std_logic := '0'; -- Valid flag, indicates when coincides
+    signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error
 
 begin
 
@@ -86,34 +70,20 @@ begin
         o_dn  => dn
     );
 
-    -- Time Digital Converter
-    tdc_0 : tdc
-    generic map(
-        L => R-1
-    )
-    port map(
-        i_rf  => i_clk,
-        i_rst => i_rst,
-        i_ep  => ep,
-        o_vld => vld
-    );
-    
+    -- Shift counter (carry chain)
     scntr_0 : scntr
     generic map(
-        L => 512,
+        L => 64,
         N => N 
     )
     port map(
-        i_clk  => i_clk,
+        i_clk  => vld,
         i_rst => i_rst,
         i_in  => ep,
-        i_en => en,
         o_out  => ab(natural(ceil(log2(real(N))))-1 downto 0)
     );
 
     ep <= up or dn; -- Construct the error pulse 
-
-    en <= not vld; -- Keep chain enabled till coinciding clocks
 
     o_vld <= vld;
 
@@ -141,4 +111,28 @@ begin
         end if;
     end process;
 
+    -- NOTE: the STOP pulse for the carry chain could also be implemented by
+    -- using the falling edge of the error pulse
+    process(i_rst, i_clk) begin
+        if i_rst = '1' then
+            lvl <= '0';
+            vld <= '0';
+        elsif rising_edge(i_clk) then
+            if lvl = '0' then
+                if ep = '1' then
+                    -- Lead/lag detected
+                    vld <= '0';
+                    lvl <= '1';
+                end if;
+            elsif lvl = '1' then
+                if ep = '0' then
+                    -- Coincided
+                    vld <= '1';
+                    lvl <= '0';
+                else 
+                    -- Leading/lagging
+                end if;
+            end if; 
+        end if;
+    end process;
 end bhv;
