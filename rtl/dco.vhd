@@ -63,7 +63,8 @@ begin
                                unsigned(step));
                     else
                         -- Leading; Slow down
-                        if cnt(R-1) = '1' and ((unsigned(cnt)-(2**cnt'length)/2) < unsigned(ab)) then
+                        if cnt(R-1) = '1' and 
+                        ((unsigned(cnt)-(2**cnt'length)/2) < unsigned(ab)) then
                             -- Clock glitch
                             cnt <= cnt;
                         elsif cnt(R-1) = '0' and (unsigned(cnt) < unsigned(ab)) then

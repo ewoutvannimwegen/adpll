@@ -2,8 +2,8 @@
 
 module adpll_tb();
 
-    localparam T_CLK = 20; // 50MHz
-    localparam T_RF = 1190; // 840kHz
+    localparam T_CLK = 5; // 200MHz
+    localparam T_RF = 1280; 
     integer i, j;
 
     reg i_clk = 1'b0;
@@ -19,14 +19,16 @@ module adpll_tb();
         .o_gen(o_gen)
     );
 
-    always begin
-        for(i = 0; i < 50*100; i=i+1) begin
+    initial begin
+        #1000;
+        for(i = 0; i < T_RF/T_CLK*100; i=i+1) begin
             #(T_CLK/2);
             i_clk = ~i_clk;
         end
     end
     
-    always begin
+    initial begin
+        #1000;
         for(j = 0; j < 100; j=j+1) begin
             #(T_RF/2);
             i_rf = ~i_rf;

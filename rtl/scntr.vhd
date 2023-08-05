@@ -11,15 +11,14 @@ use ieee.numeric_std.all;
 -- NOTE: Uses the prop. delay through the MUX as delay. Gate level sim required
 entity scntr is
     generic (
-        L : natural := 64; -- Lenght carry chain
-        N : natural := 16   -- Number of FF
+        L : natural := 4*work.common.CC_MAX_LEN; -- Lenght carry chain
+        N : natural := 128   -- Number of FF
     );
 	port (
 		i_clk  : in  std_logic;                    -- System clock
         i_rst  : in  std_logic;                    -- Reset
 		i_in   : in  std_logic;                    -- Input data
-		o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0);  -- Output data
-        o_flw  : out std_logic -- Overflow
+		o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0)  -- Output data
 	);
 end scntr;
 
@@ -65,7 +64,7 @@ architecture bhv of scntr is
 
     component s2b
         generic (
-            R : natural := N-1
+            R : natural := natural(log2(real(N)))
         );
         port (
             i_clk : in  std_logic;
@@ -83,16 +82,18 @@ architecture bhv of scntr is
     signal do : std_logic_vector(N-1 downto 0) := (others => '0'); -- FF out
 
     -- Take a look at the 'device map' in Vivado after synthesis to find a good spot
-    constant xoff : integer := 43; 
+    constant xoff : integer := 60; 
     constant yoff : integer := 0;
-
 begin
+
+    assert L/4 <= work.common.CC_MAX_LEN report "L:" & integer'image(L) severity error;
+
     gen_carry4_inst : for i in 0 to L/4-1 generate
         -- CARRY4 : https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/CARRY4
         -- Location constraint : https://www.xilinx.com/htmldocs/xilinx14_7/cgd.pdf
         gen_carry4_inst_0 : if i = 0 generate
             attribute loc of carry4_inst_0 : label is "SLICE_X" & 
-                integer'image(xoff) & "Y" & integer'image(yoff+i);
+                integer'image(xoff) & "Y" & integer'image(yoff);
         begin
             carry4_inst_0 : CARRY4
             port map (
@@ -104,8 +105,7 @@ begin
             );
         end generate;
 
-
-        gen_carry4_inst_i : if i > 0 generate
+        gen_carry4_inst_i : if i > 0 and i < L generate
             attribute loc of carry4_inst_i : label is "SLICE_X" & 
                 integer'image(xoff) & "Y" & integer'image(yoff+i);
         begin
@@ -118,7 +118,7 @@ begin
                 S      => "1111"
             );
         end generate;
-        
+
     end generate;
 
     gen_fdce_inst : for i in 0 to N-1 generate
@@ -134,15 +134,13 @@ begin
     
     s2b_inst : s2b
     generic map (
-        R => N-1
+        R => natural(log2(real(N)))
     )
     port map (
         i_clk => i_clk,
         i_rst => i_rst,
-        i_in => do(N-2 downto 0),
+        i_in => do(N-1 downto 1),
         o_out => o_out 
     );
-    
-    o_flw <= do(N-1);
 
 end bhv;

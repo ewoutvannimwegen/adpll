@@ -2,12 +2,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
-
+use work.common.all;
 -- Phase to Digital
 entity p2d is
     generic (
         R : natural := 8; -- Resolution error
-        N : natural := 16 -- Number of FF's
+        N : natural := 128 -- Number of FF's
     );
     port (
         i_clk : in  std_logic;                     -- System clock
@@ -23,6 +23,7 @@ end p2d;
 -- The sign of the error is determined by the first system
 -- The absolute value of the error by the second
 architecture bhv of p2d is
+    attribute dont_touch : string;
 
     -- Phase Frequency Detector
     component pfd is
@@ -38,15 +39,14 @@ architecture bhv of p2d is
     -- Shift counter
     component scntr is
     generic (
-        L : natural := 64; -- Length carry chain
-        N : natural := N   -- Number of FF's; Currently only 16 is supported!
+        L : natural := 4*work.common.CC_MAX_LEN; -- Length carry chain
+        N : natural := N   
     );
     port (
         i_clk  : in  std_logic;                     -- Reference clock
         i_rst : in  std_logic;                     -- Reset
         i_in  : in  std_logic;                     -- Input data
-        o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0); -- Absolute error 
-        o_flw : out std_logic  -- Overflow
+        o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0) -- Absolute error 
     );
     end component;
 
@@ -56,7 +56,9 @@ architecture bhv of p2d is
     signal ep   : std_logic := '0'; -- Error pulse
     signal lvl  : std_logic := '0'; -- Logic level last coincide
     signal vld  : std_logic := '0'; -- Valid flag, indicates when coincides
-    signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error
+    signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute phase error
+    signal er   : std_logic_vector(R-1 downto 0) := (others => '0');
+    attribute dont_touch of er : signal is "true";
 
 begin
 
@@ -73,19 +75,21 @@ begin
     -- Shift counter (carry chain)
     scntr_0 : scntr
     generic map(
-        L => 64,
+        L => 4*work.common.CC_MAX_LEN,
         N => N 
     )
     port map(
-        i_clk  => vld,
+        i_clk => vld,
         i_rst => i_rst,
         i_in  => ep,
-        o_out  => ab(natural(ceil(log2(real(N))))-1 downto 0)
+        o_out => ab(natural(ceil(log2(real(N))))-1 downto 0)
     );
 
     ep <= up or dn; -- Construct the error pulse 
 
     o_vld <= vld;
+
+    o_er <= er;
 
     -- Determine the sign of the error
     process(i_rst, dn) 
@@ -104,10 +108,10 @@ begin
     begin
         if sign = '1' then
             -- Negative 
-            o_er <= std_logic_vector(signed(not std_logic_vector(resize(unsigned(ab), o_er'length))) + 1); -- 2's comp inverse
+            er <= std_logic_vector(signed(not ('0' & ab)) + 1); -- 2's comp inverse
         else 
             -- Positive
-            o_er <= std_logic_vector(resize(unsigned(ab), o_er'length));
+            er <= '0' & ab;
         end if;
     end process;
 

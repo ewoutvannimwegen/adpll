@@ -8,14 +8,15 @@ entity s2b_tb is
 end s2b_tb;
 
 architecture tb of s2b_tb is
+    constant R : natural := 7; -- Resolution output
     signal i_clk : std_logic := '0';
     signal i_rst : std_logic := '0';
-    signal i_in  : std_logic_vector(14 downto 0) := (others => '0');
-    signal o_out : std_logic_vector(3 downto 0) := (others => '0');
+    signal i_in  : std_logic_vector(2**R-1 downto 0) := (others => '0');
+    signal o_out : std_logic_vector(R-1 downto 0) := (others => '0');
 begin
     s2b_0 : entity work.s2b
     generic map(
-        R => 15
+        R => R
     )
     port map(
         i_clk => i_clk,
@@ -45,10 +46,10 @@ begin
 
         wait until falling_edge(i_clk);
 
-        i_in <= "000000000000111";
+        i_in <= std_logic_vector(to_unsigned(13, i_in'length));
         wait until falling_edge(i_clk);
         
-        i_in <= "001111111111111";
+        i_in <= std_logic_vector(to_unsigned(3, i_in'length));
         wait until falling_edge(i_clk);
 
         wait;

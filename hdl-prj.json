@@ -13,6 +13,7 @@
         { "file": "rtl/tdc.vhd",                       "language": "vhdl" },
         { "file": "rtl/p2d.vhd",                       "language": "vhdl" },
         { "file": "rtl/dco.vhd",                       "language": "vhdl" },
+        { "file": "rtl/s2b.vhd",                       "language": "vhdl" },
         { "file": "rtl/adpll.vhd",                       "language": "vhdl" },
         { "file": "rtl/tff.vhd",                       "language": "vhdl" },
         { "file": "rtl/cntr.vhd",                       "language": "vhdl" },

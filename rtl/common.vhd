@@ -4,8 +4,11 @@ use ieee.numeric_std.all;
 use ieee.math_real.all;
 
 package common is
+    type natural_vector is array (natural range <>) of natural; 
+    constant CC_MAX_LEN : integer := 150;
 	function to_string (a : std_logic_vector) return string;
-    function cnt_ones  (s : std_logic_vector) return integer;
+    function cnt_ones  (s : std_logic_vector) return natural;
+    function get_off   (mid : std_logic_vector; cs : natural_vector) return natural;
 end common;
 
 package body common is
@@ -21,15 +24,25 @@ package body common is
 		return b;
 	end function;
 
-
-    function cnt_ones (s : std_logic_vector) return integer is
-        variable tmp : integer := 0;
+    function cnt_ones (s : std_logic_vector) return natural is
+        variable tmp : natural := 0;
     begin
         for i in s'range loop
             if s(i) = '1' then
                 tmp := tmp + 1;
+            end if; end loop;
+        return tmp;
+    end function;
+    
+    function get_off (mid : std_logic_vector; cs : natural_vector) return natural is
+        variable off : natural := 0;
+    begin
+        for i in mid'range loop
+            if mid(i) = '1' then
+                off := off + cs(i);
             end if;
         end loop;
-        return tmp;
+        assert false report "mid: " & to_string(mid) & ", off: " & natural'image(off) severity note;
+        return off;
     end function;
 end common;
