@@ -11,7 +11,7 @@ architecture tb of s2b_tb is
     constant R : natural := 7; -- Resolution output
     signal i_clk : std_logic := '0';
     signal i_rst : std_logic := '0';
-    signal i_in  : std_logic_vector(2**R-1 downto 0) := (others => '0');
+    signal i_in  : std_logic_vector(2**R-2 downto 0) := (others => '0');
     signal o_out : std_logic_vector(R-1 downto 0) := (others => '0');
 begin
     s2b_0 : entity work.s2b
@@ -50,6 +50,9 @@ begin
         wait until falling_edge(i_clk);
         
         i_in <= std_logic_vector(to_unsigned(3, i_in'length));
+        wait until falling_edge(i_clk);
+        
+        i_in <= (others => '1');
         wait until falling_edge(i_clk);
 
         wait;

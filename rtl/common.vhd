@@ -39,7 +39,7 @@ package body common is
     begin
         for i in mid'range loop
             if mid(i) = '1' then
-                off := off + cs(i);
+                off := off + cs(i) + 1;
             end if;
         end loop;
         assert false report "mid: " & to_string(mid) & ", off: " & natural'image(off) severity note;

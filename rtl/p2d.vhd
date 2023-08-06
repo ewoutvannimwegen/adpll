@@ -43,10 +43,10 @@ architecture bhv of p2d is
         N : natural := N   
     );
     port (
-        i_clk  : in  std_logic;                     -- Reference clock
+        i_clk : in  std_logic;                     -- Reference clock
         i_rst : in  std_logic;                     -- Reset
         i_in  : in  std_logic;                     -- Input data
-        o_out  : out std_logic_vector(natural(ceil(log2(real(N))))-1 downto 0) -- Absolute error 
+        o_out : out std_logic_vector(R-2 downto 0) -- Absolute error 
     );
     end component;
 
@@ -55,10 +55,9 @@ architecture bhv of p2d is
     signal sign : std_logic := '0'; -- Error sign
     signal ep   : std_logic := '0'; -- Error pulse
     signal lvl  : std_logic := '0'; -- Logic level last coincide
-    signal vld  : std_logic := '0'; -- Valid flag, indicates when coincides
+    signal vld  : std_logic_vector(2 downto 0)   := (others => '0'); -- Valid 
     signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute phase error
-    signal er   : std_logic_vector(R-1 downto 0) := (others => '0');
-    attribute dont_touch of er : signal is "true";
+    signal trg : std_logic := '0'; -- Trigger
 
 begin
 
@@ -75,21 +74,19 @@ begin
     -- Shift counter (carry chain)
     scntr_0 : scntr
     generic map(
-        L => 4*work.common.CC_MAX_LEN,
+        L => 512,
         N => N 
     )
     port map(
-        i_clk => vld,
+        i_clk => trg,
         i_rst => i_rst,
         i_in  => ep,
-        o_out => ab(natural(ceil(log2(real(N))))-1 downto 0)
+        o_out => ab
     );
 
-    ep <= up or dn; -- Construct the error pulse 
-
-    o_vld <= vld;
-
-    o_er <= er;
+    ep     <= up or dn; -- Construct the error pulse 
+    vld(0) <= trg;
+    o_vld  <= vld(2);
 
     -- Determine the sign of the error
     process(i_rst, dn) 
@@ -98,8 +95,6 @@ begin
             sign <= '0';
         elsif rising_edge(dn) then
             sign <= up;
-        else
-            sign <= sign;
         end if;
     end process;
 
@@ -108,10 +103,10 @@ begin
     begin
         if sign = '1' then
             -- Negative 
-            er <= std_logic_vector(signed(not ('0' & ab)) + 1); -- 2's comp inverse
+            o_er <= std_logic_vector(signed(not ('0' & ab)) + 1); -- 2's comp inverse
         else 
             -- Positive
-            er <= '0' & ab;
+            o_er <= '0' & ab;
         end if;
     end process;
 
@@ -120,19 +115,23 @@ begin
     process(i_rst, i_clk) begin
         if i_rst = '1' then
             lvl <= '0';
-            vld <= '0';
+            trg <= '0';
+            vld(2 downto 1) <= (others => '0');
         elsif rising_edge(i_clk) then
+            vld(2) <= vld(1);
+            vld(1) <= vld(0);
+
             if lvl = '0' then
                 if ep = '1' then
                     -- Lead/lag detected
-                    vld <= '0';
-                    lvl <= '1';
+                    trg    <= '0';
+                    lvl    <= '1';
                 end if;
             elsif lvl = '1' then
                 if ep = '0' then
                     -- Coincided
-                    vld <= '1';
-                    lvl <= '0';
+                    trg    <= '1';
+                    lvl    <= '0';
                 else 
                     -- Leading/lagging
                 end if;

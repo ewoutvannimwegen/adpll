@@ -10,7 +10,7 @@ entity dco is
     port (
         i_clk  : in  std_logic;                      -- System clock
         i_rst  : in  std_logic;                      -- Reset
-        i_step : in  std_logic_vector(3 downto 0);   -- Step coefficient
+        i_step : in  std_logic_vector(R-1 downto 0);   -- Step coefficient
         i_pe   : in  std_logic_vector(R-1 downto 0); -- Phase error
         i_vld  : in  std_logic;                      -- Valid error
         o_gen  : out std_logic                       -- Generated clock
@@ -20,10 +20,12 @@ end dco;
 -- Use of the step coefficient instead of direct step size to avoid using mulitiplications
 -- After finding a valid phase error the correction is only applied once.
 architecture bhv of dco is
+    attribute dont_touch : string;
     signal cnt  : std_logic_vector(R-1 downto 0) := (others => '0'); -- Internal counter
+    attribute dont_touch of cnt : signal is "true";
     signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error in steps
     signal cor  : std_logic := '0';                                  -- Phase correction flag
-    signal step : std_logic_vector(3 downto 0) := (others => '0');   -- Step size 
+    signal step : std_logic_vector(R-1 downto 0) := (others => '0');   -- Step size 
 begin
     o_gen <= cnt(R-1); -- Generate clock based on MSB of internal counter
 

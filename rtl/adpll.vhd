@@ -11,6 +11,7 @@ entity adpll is
         i_clk : in  std_logic; -- System clock
         i_rf  : in  std_logic; -- Reference clock
         i_rst : in  std_logic; -- Reset
+        i_step : in std_logic_vector(R-1 downto 0); -- Step coefficient
         o_gen : out std_logic  -- Generated clock
     );
 end adpll;
@@ -40,7 +41,7 @@ architecture bhv of adpll is
     port (
         i_clk  : in  std_logic;                      -- System clock
         i_rst  : in  std_logic;                      -- Reset
-        i_step : in  std_logic_vector(3 downto 0);   -- Step size
+        i_step : in  std_logic_vector(R-1 downto 0);   -- Step size
         i_pe   : in  std_logic_vector(R-1 downto 0); -- Phase error
         i_vld  : in  std_logic;                      -- Valid error
         o_gen  : out std_logic                       -- Generated clock
@@ -75,7 +76,7 @@ begin
     port map(
         i_clk  => i_clk,
         i_rst  => i_rst,
-        i_step => x"0",
+        i_step => i_step,
         i_pe   => pe,
         i_vld  => vld,
         o_gen  => fb
