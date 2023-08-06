@@ -43,7 +43,8 @@ architecture bhv of p2d is
         N : natural := N   
     );
     port (
-        i_clk : in  std_logic;                     -- Reference clock
+        i_trg : in  std_logic;                     -- Trigger
+        i_clk : in  std_logic;                     -- System clock
         i_rst : in  std_logic;                     -- Reset
         i_in  : in  std_logic;                     -- Input data
         o_out : out std_logic_vector(R-2 downto 0) -- Absolute error 
@@ -55,10 +56,11 @@ architecture bhv of p2d is
     signal sign : std_logic := '0'; -- Error sign
     signal ep   : std_logic := '0'; -- Error pulse
     signal lvl  : std_logic := '0'; -- Logic level last coincide
-    signal vld  : std_logic_vector(2 downto 0)   := (others => '0'); -- Valid 
+    signal vld  : std_logic_vector(5 downto 0)   := (others => '0'); -- Valid 
+    attribute dont_touch of vld : signal is "true";
     signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute phase error
+    attribute dont_touch of ab : signal is "true";
     signal trg : std_logic := '0'; -- Trigger
-
 begin
 
     -- Phase Frequency Detector
@@ -78,15 +80,15 @@ begin
         N => N 
     )
     port map(
-        i_clk => trg,
+        i_trg => trg,
+        i_clk => i_clk,
         i_rst => i_rst,
         i_in  => ep,
         o_out => ab
     );
 
     ep     <= up or dn; -- Construct the error pulse 
-    vld(0) <= trg;
-    o_vld  <= vld(2);
+    o_vld  <= vld(vld'length-1);
 
     -- Determine the sign of the error
     process(i_rst, dn) 
@@ -110,30 +112,35 @@ begin
         end if;
     end process;
 
-    -- NOTE: the STOP pulse for the carry chain could also be implemented by
-    -- using the falling edge of the error pulse
+    -- Track logic level of last coincide & trigger the tapped delay line
     process(i_rst, i_clk) begin
         if i_rst = '1' then
             lvl <= '0';
-            trg <= '0';
-            vld(2 downto 1) <= (others => '0');
+            trg <= '0'; 
+            vld <= (others => '0'); 
         elsif rising_edge(i_clk) then
-            vld(2) <= vld(1);
-            vld(1) <= vld(0);
+            vld(0) <= trg;
+            for i in 1 to vld'length-1 loop
+                vld(i) <= vld(i-1);
+            end loop;
 
             if lvl = '0' then
                 if ep = '1' then
                     -- Lead/lag detected
-                    trg    <= '0';
-                    lvl    <= '1';
+                    trg <= '0';
+                    lvl <= '1';
+                else
+                    -- Wait for lead/lag
+                    null;
                 end if;
             elsif lvl = '1' then
                 if ep = '0' then
                     -- Coincided
-                    trg    <= '1';
-                    lvl    <= '0';
+                    trg <= '1';
+                    lvl <= '0';
                 else 
                     -- Leading/lagging
+                    null;
                 end if;
             end if; 
         end if;

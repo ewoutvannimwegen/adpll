@@ -11,10 +11,11 @@ use ieee.numeric_std.all;
 -- NOTE: Uses the prop. delay through the MUX as delay. Gate level sim required
 entity scntr is
     generic (
-        L : natural := 4*work.common.CC_MAX_LEN; -- Lenght carry chain
+        L : natural := 512; -- Lenght carry chain
         N : natural := 128   -- Number of FF
     );
 	port (
+        i_trg  : in  std_logic;                    -- Trigger
 		i_clk  : in  std_logic;                    -- System clock
         i_rst  : in  std_logic;                    -- Reset
 		i_in   : in  std_logic;                    -- Input data
@@ -122,13 +123,16 @@ begin
     end generate;
 
     gen_fdce_inst : for i in 0 to N-1 generate
+        attribute loc of fdce_inst_i : label is "SLICE_X" & 
+            integer'image(xoff) & "Y" & integer'image(yoff+i);
+    begin
         fdce_inst_i : FDCE
         port map (
-            C => i_clk,
+            C => i_trg,
             CLR => i_rst,
             D  => di(i*off+off-1),
             Q => do(i),
-            CE => '1'
+            CE => '1' 
         );
     end generate;
     
