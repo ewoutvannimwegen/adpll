@@ -3,7 +3,7 @@
 module adpll_tb();
 
     localparam T_CLK = 20; // 50MHz
-    localparam T_RF = 640; 
+    localparam T_RF = 630; 
     integer i, j;
 
     reg i_clk = 1'b0;
@@ -30,7 +30,7 @@ module adpll_tb();
     
     initial begin
         #1000;
-        #(T_RF/5);
+        #(T_RF/4);
         for(j = 0; j < 200; j=j+1) begin
             #(T_RF/2);
             i_rf = ~i_rf;

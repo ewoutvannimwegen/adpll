@@ -114,6 +114,7 @@ begin
     end process;
        
     process (lvl, ep) begin
+        lvl_nxt <= lvl;
         if lvl = '0' then
             if ep = '1' then
                 -- Lead/lag detected
@@ -121,6 +122,7 @@ begin
                 lvl_nxt <= '1';
             else
                 -- Wait for lead/lag
+                trg <= '1';
                 null;
             end if;
         elsif lvl = '1' then
@@ -129,6 +131,7 @@ begin
                 trg <= '1';
                 lvl_nxt <= '0';
             else 
+                trg <= '0';
                 -- Leading/lagging
                 null;
             end if;

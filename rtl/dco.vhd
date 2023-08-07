@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.math_real.all;
 use work.common.all;
 -- Digital Controlled Oscillator
 entity dco is
@@ -21,6 +22,7 @@ end dco;
 -- Use of the step coefficient instead of direct step size to avoid using mulitiplications
 -- After finding a valid phase error the correction is only applied once.
 architecture bhv of dco is
+    constant FDIV : natural := natural(ceil(real(work.common.T_CLK)/real(work.common.CARRY4_PDLY)));
     attribute dont_touch : string;
     signal cnt  : std_logic_vector(R-1 downto 0) := (others => '0'); -- Internal counter
     attribute dont_touch of cnt : signal is "true";
@@ -54,14 +56,18 @@ begin
     end generate;
     
     gen_TDLM : if TDLM = '1' generate
+        -- Convert carry chain delay to cycles
         process(i_pe, i_step) 
         begin
             if i_pe(R-1) = '1' then
                 -- Negative
-                 ab <= std_logic_vector(signed(not i_pe) + 1); -- 2's comp inverse
+                ab <= std_logic_vector(resize(shift_left(resize(unsigned(
+                      std_logic_vector(signed(not i_pe) + 1) -- 2's comp inverse
+                  ), 32), to_integer(unsigned(i_step)))/FDIV, ab'length));         -- Cycles * step size
             else 
                 -- Positive
-                ab <= i_pe;
+                ab <= std_logic_vector(resize(shift_left(resize(unsigned(i_pe),
+                      32), to_integer(unsigned(i_step)))/FDIV, ab'length));         -- Cycles * step size
             end if;
         end process;
     end generate;

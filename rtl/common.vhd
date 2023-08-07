@@ -5,7 +5,9 @@ use ieee.math_real.all;
 
 package common is
     type natural_vector is array (natural range <>) of natural; 
-    constant CC_MAX_LEN : integer := 150;
+    constant CC_MAX_LEN  : integer := 150; -- Max length CARRY4 chain
+    constant CARRY4_PDLY : natural := 187; -- Propegation delay CARRY4 in ps
+    constant T_CLK       : natural := 20000; -- Period system clock in ps
 	function to_string (a : std_logic_vector) return string;
     function cnt_ones  (s : std_logic_vector) return natural;
     function get_off   (mid : std_logic_vector; cs : natural_vector) return natural;
@@ -39,7 +41,11 @@ package body common is
     begin
         for i in mid'range loop
             if mid(i) = '1' then
-                off := off + cs(i) + 1;
+                if i = 0 then
+                    off := off + cs(i) + 1;
+                else
+                    off := off + 4 + 1;
+                end if;
             end if;
         end loop;
         assert false report "mid: " & to_string(mid) & ", off: " & natural'image(off) severity note;
