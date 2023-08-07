@@ -29,6 +29,7 @@ architecture bhv of dco is
     signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error in steps
     attribute dont_touch of ab : signal is "true";
     signal cor  : std_logic := '0';                                  -- Phase correction flag
+    attribute dont_touch of cor : signal is "true";
     signal step : std_logic_vector(R-1 downto 0) := (others => '0');   -- Step size 
 begin
     o_gen <= cnt(R-1); -- Generate clock based on MSB of internal counter
