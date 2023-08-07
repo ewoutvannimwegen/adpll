@@ -36,7 +36,8 @@ architecture bhv of adpll is
     -- Digitally Controlled Oscillator
     component dco is
     generic (
-        R : natural := 8 -- Resolution error
+        R : natural := 8; -- Resolution error
+        TDLM : std_logic := '1' -- Tapped Delay Line Mode
     );
     port (
         i_clk  : in  std_logic;                      -- System clock
@@ -71,7 +72,8 @@ begin
     -- Digitally Controlled Oscillator
     dco_0 : dco 
     generic map(
-        R => R
+        R => R,
+        TDLM => '1'
     )
     port map(
         i_clk  => i_clk,

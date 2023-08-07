@@ -56,6 +56,7 @@ architecture bhv of p2d is
     signal sign : std_logic := '0'; -- Error sign
     signal ep   : std_logic := '0'; -- Error pulse
     signal lvl  : std_logic := '0'; -- Logic level last coincide
+    signal lvl_nxt  : std_logic := '0';
     signal vld  : std_logic_vector(5 downto 0)   := (others => '0'); -- Valid 
     attribute dont_touch of vld : signal is "true";
     signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute phase error
@@ -111,38 +112,40 @@ begin
             o_er <= '0' & ab;
         end if;
     end process;
+       
+    process (lvl, ep) begin
+        if lvl = '0' then
+            if ep = '1' then
+                -- Lead/lag detected
+                trg <= '0';
+                lvl_nxt <= '1';
+            else
+                -- Wait for lead/lag
+                null;
+            end if;
+        elsif lvl = '1' then
+            if ep = '0' then
+                -- Coincided
+                trg <= '1';
+                lvl_nxt <= '0';
+            else 
+                -- Leading/lagging
+                null;
+            end if;
+        end if; 
+    end process;
 
     -- Track logic level of last coincide & trigger the tapped delay line
     process(i_rst, i_clk) begin
         if i_rst = '1' then
             lvl <= '0';
-            trg <= '0'; 
             vld <= (others => '0'); 
         elsif rising_edge(i_clk) then
             vld(0) <= trg;
             for i in 1 to vld'length-1 loop
                 vld(i) <= vld(i-1);
             end loop;
-
-            if lvl = '0' then
-                if ep = '1' then
-                    -- Lead/lag detected
-                    trg <= '0';
-                    lvl <= '1';
-                else
-                    -- Wait for lead/lag
-                    null;
-                end if;
-            elsif lvl = '1' then
-                if ep = '0' then
-                    -- Coincided
-                    trg <= '1';
-                    lvl <= '0';
-                else 
-                    -- Leading/lagging
-                    null;
-                end if;
-            end if; 
+            lvl <= lvl_nxt;
         end if;
     end process;
 end bhv;

@@ -20,7 +20,6 @@
         { "file": "rtl/scntr.vhd",                       "language": "vhdl" },
         { "file": "sim/pll_tb.vhd",                       "language": "vhdl" },
         { "file": "sim/p2d_tb.vhd",                       "language": "vhdl" },
-        { "file": "sim/adpll_tb.vhd",                       "language": "vhdl" },
         { "file": "sim/cntr_tb.vhd",                       "language": "vhdl" }
     ]
 }

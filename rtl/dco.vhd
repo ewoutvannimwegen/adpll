@@ -5,7 +5,8 @@ use work.common.all;
 -- Digital Controlled Oscillator
 entity dco is
     generic(
-        R : natural := 8 -- Resolution error
+        R   : natural := 8; -- Resolution error
+        TDLM : std_logic := '1' -- Tapped Delay Line Mode
     );
     port (
         i_clk  : in  std_logic;                      -- System clock
@@ -24,6 +25,7 @@ architecture bhv of dco is
     signal cnt  : std_logic_vector(R-1 downto 0) := (others => '0'); -- Internal counter
     attribute dont_touch of cnt : signal is "true";
     signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error in steps
+    attribute dont_touch of ab : signal is "true";
     signal cor  : std_logic := '0';                                  -- Phase correction flag
     signal step : std_logic_vector(R-1 downto 0) := (others => '0');   -- Step size 
 begin
@@ -33,21 +35,36 @@ begin
     step <= std_logic_vector(shift_left(to_unsigned(1, i_step'length), 
              to_integer(unsigned(i_step))));
 
-    -- Convert phase error in cycles to ABS in steps
-    -- Phase error is in cycles, multiply by steps per cycle!
-    process(i_pe, i_step) 
-    begin
-        if i_pe(R-1) = '1' then
-            -- Negative
-            ab <= std_logic_vector(shift_left(unsigned(
-                  std_logic_vector(signed(not i_pe) + 1) -- 2's comp inverse
-              ), to_integer(unsigned(i_step))));         -- Cycles * step size
-        else 
-            -- Positive
-            ab <= std_logic_vector(shift_left(unsigned(i_pe), 
-                  to_integer(unsigned(i_step)))); -- Cycles * step cycles
-        end if;
-    end process;
+    gen_CNTM : if TDLM = '0' generate
+        -- Convert phase error in cycles to ABS in steps
+        -- Phase error is in cycles, multiply by steps per cycle!
+        process(i_pe, i_step) 
+        begin
+            if i_pe(R-1) = '1' then
+                -- Negative
+                    ab <= std_logic_vector(shift_left(unsigned(
+                          std_logic_vector(signed(not i_pe) + 1) -- 2's comp inverse
+                      ), to_integer(unsigned(i_step))));         -- Cycles * step size
+            else 
+                -- Positive
+                ab <= std_logic_vector(shift_left(unsigned(i_pe), 
+                      to_integer(unsigned(i_step)))); -- Cycles * step cycles
+            end if;
+        end process;
+    end generate;
+    
+    gen_TDLM : if TDLM = '1' generate
+        process(i_pe, i_step) 
+        begin
+            if i_pe(R-1) = '1' then
+                -- Negative
+                 ab <= std_logic_vector(signed(not i_pe) + 1); -- 2's comp inverse
+            else 
+                -- Positive
+                ab <= i_pe;
+            end if;
+        end process;
+    end generate;
 
     process(i_rst, i_clk) 
     begin

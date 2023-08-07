@@ -37,8 +37,8 @@ architecture bhv of scntr is
 
     component CARRY4 
         port (
-            CI : in std_logic;
-            CYINIT : in std_logic;
+            CI : in std_logic; -- Cascade input
+            CYINIT : in std_logic; -- Initial input
             DI : in std_logic_vector(3 downto 0);
             S : in std_logic_vector(3 downto 0);
             CO : out std_logic_vector(3 downto 0);
@@ -99,8 +99,8 @@ begin
             carry4_inst_0 : CARRY4
             port map (
                 CO     => di(3 downto 0),
-                CI     => i_in,
-                CYINIT => '0',
+                CI     => '0',
+                CYINIT => i_in,
                 DI     => "0000",
                 S      => "1111"
             );
