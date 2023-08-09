@@ -11,6 +11,7 @@ package common is
 	function to_string (a : std_logic_vector) return string;
     function cnt_ones  (s : std_logic_vector) return natural;
     function get_off   (mid : std_logic_vector; cs : natural_vector) return natural;
+    function f_log2 (x : positive) return natural;
     function dec2bcd   (dec : std_logic_vector) return std_logic_vector;
 end common;
 
@@ -53,14 +54,27 @@ package body common is
         return off;
     end function;
 
+    function f_log2 (x : positive) return natural is
+      variable i : natural := x;
+      variable n : natural := 0;
+    begin
+        while (i > 1) loop
+            i := i / 2;
+            n := n + 1;
+        end loop;
+        if x > 2**n then
+            return n + 1;
+        else
+            return n;
+        end if;
+   end function;
+    
     function dec2bcd (
         dec : std_logic_vector
     ) return std_logic_vector is 
-        variable dig : natural := natural(ceil(log2(real(to_integer(
-            unsigned(dec))))/log2(real(10))));
+        variable dig : natural := natural(f_log2(to_integer(unsigned(dec)))/f_log2(10)) + 1;
         variable tmp : unsigned(dec'length-1 downto 0) := unsigned(dec);
-        variable bcd : std_logic_vector(natural(ceil(log2(real(to_integer(
-            unsigned(dec))))/log2(real(10))))*4-1 downto 0) := (others => '0');
+        variable bcd : std_logic_vector((natural(f_log2(to_integer(unsigned(dec)))/f_log2(10))+1)*4-1 downto 0) := (others => '0');
     begin
         assert false report "dec: " & to_string(dec) severity note;
         assert false report "dig: " & natural'image(dig) severity note;

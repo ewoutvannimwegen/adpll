@@ -10,11 +10,12 @@ end disp_drv_tb;
 architecture tb of disp_drv_tb is
     signal i_clk : std_logic := '0';
     signal i_rst : std_logic := '0';
-    signal i_dec : std_logic_vector(6 downto 0) := (others => '0');
+    signal i_dec : std_logic_vector(7 downto 0) := (others => '0');
     signal o_seg : std_logic_vector(3*7-1 downto 0) := (others => '0');
 begin
     disp_drv_0 : entity work.disp_drv
     generic map(
+        R => 8,
         N => 3
     )
     port map(

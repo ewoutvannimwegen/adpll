@@ -9,12 +9,13 @@ use work.common.all;
 -- Display
 entity disp_drv is
     generic (
+        R : natural := 8; -- Resolution input
         N : natural := 3 -- Number of 7-segment displays
     );
     port (
         i_clk : in  std_logic;                    -- System clock
         i_rst : in  std_logic;                    -- Reset
-        i_dec : in  std_logic_vector(6 downto 0); -- Decimal in
+        i_dec : in  std_logic_vector(R-1 downto 0); -- Decimal in
         o_seg : out std_logic_vector(7*N-1 downto 0) -- Segment out
     );
 end disp_drv;
