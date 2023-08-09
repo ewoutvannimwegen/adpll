@@ -48,7 +48,7 @@ begin
             bcd <= (others => '0');
         elsif rising_edge(i_clk) then
             if to_integer(unsigned(i_dec)) > 0 then
-                bcd <= work.common.dec2bcd(i_dec);
+                bcd <= std_logic_vector(resize(unsigned(work.common.dec2bcd(i_dec)), bcd'length));
             end if;
         end if;
     end process;

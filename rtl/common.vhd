@@ -56,26 +56,23 @@ package body common is
     function dec2bcd (
         dec : std_logic_vector
     ) return std_logic_vector is 
-        variable dig : natural := 0;
-        variable tmp : unsigned(dec'length-1 downto 0) := (others => '0');
-        variable bcd : std_logic_vector(dig*4-1 downto 0) := (others => '0');
+        variable dig : natural := natural(ceil(log2(real(to_integer(
+            unsigned(dec))))/log2(real(10))));
+        variable tmp : unsigned(dec'length-1 downto 0) := unsigned(dec);
+        variable bcd : std_logic_vector(natural(ceil(log2(real(to_integer(
+            unsigned(dec))))/log2(real(10))))*4-1 downto 0) := (others => '0');
     begin
         assert false report "dec: " & to_string(dec) severity note;
-
-        dig := natural(ceil(
-            log2(real(to_integer(unsigned(dec))))/log2(real(10))));
         assert false report "dig: " & natural'image(dig) severity note;
 
         for i in 0 to dig-1 loop
-            if i = 0 then
-                bcd(4*i+4-1 downto 4*i) := 
-                    std_logic_vector(resize(tmp / (10**(dig-1-i)), 4));
-                tmp := unsigned(dec) - 10**(dig-1-i);
-            else
-                bcd(4*i+4-1 downto 4*i) := std_logic_vector(resize(
-                    tmp / (10**(dig-1-i)), 4));
-                tmp := tmp - 10**(dig-1-i);
-            end if;
+            assert false report "tmp(" & natural'image(i) & "): " & 
+                integer'image(to_integer(tmp)) severity note;
+
+            bcd(4*i+4-1 downto 4*i) := std_logic_vector(resize(
+                tmp / (10**(dig-1-i)), 4));
+            tmp := resize(tmp - resize(unsigned(bcd(4*i+4-1 downto 4*i)), 
+                tmp'length) * (10**(dig-1-i)), tmp'length);
             assert false report "bcd(" & natural'image(i) & "): " &
                 to_string(bcd(4*i+4-1 downto 4*i)) severity note;
         end loop;

@@ -50,6 +50,8 @@ begin
         wait until falling_edge(i_clk);
         i_dec <= std_logic_vector(to_unsigned(52, i_dec'length));
         wait until falling_edge(i_clk);
+        i_rst <= '1';
+        wait until rising_edge(i_clk);
 
         wait;
     end process;
