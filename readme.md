@@ -52,6 +52,7 @@ the Zynq-7000 series it is 150.
 - [TDC verilog implementation](https://github.com/RuiMachado39/TDC)
 - [Xilinx/AMD external simulators](https://docs.xilinx.com/r/en-US/ug900-vivado-logic-simulation/Running-Timing-Simulation-Using-Third-Party-Tools)
 - [Xilinx/AMD carry chains](https://docs.xilinx.com/v/u/en-US/ug474_7Series_CLB)
+- [Xilinx/AMD IBUFDS (differential input buffer)](https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/IBUFDS)
 
 Post-synthesis timing simulation requires a Verilog based testbench, VHDL not supported!
 

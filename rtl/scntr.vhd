@@ -12,7 +12,11 @@ use ieee.numeric_std.all;
 entity scntr is
     generic (
         L : natural := 512; -- Lenght carry chain
-        N : natural := 128   -- Number of FF
+        N : natural := 128; -- Number of FF
+       
+        -- Take a look at the 'device map' in Vivado after synthesis to find a good spot
+        X : integer := 0;   -- X offset
+        Y : integer := 0    -- Y offset
     );
 	port (
         i_trg  : in  std_logic;                    -- Trigger
@@ -82,9 +86,6 @@ architecture bhv of scntr is
     signal di : std_logic_vector(L-1 downto 0) := (others => '0'); -- MUX out
     signal do : std_logic_vector(N-1 downto 0) := (others => '0'); -- FF out
 
-    -- Take a look at the 'device map' in Vivado after synthesis to find a good spot
-    constant xoff : integer := 60; 
-    constant yoff : integer := 0;
 begin
 
     assert L/4 <= work.common.CC_MAX_LEN report "L:" & integer'image(L) severity error;
@@ -94,7 +95,7 @@ begin
         -- Location constraint : https://www.xilinx.com/htmldocs/xilinx14_7/cgd.pdf
         gen_carry4_inst_0 : if i = 0 generate
             attribute loc of carry4_inst_0 : label is "SLICE_X" & 
-                integer'image(xoff) & "Y" & integer'image(yoff);
+                integer'image(X) & "Y" & integer'image(Y);
         begin
             carry4_inst_0 : CARRY4
             port map (
@@ -108,7 +109,7 @@ begin
 
         gen_carry4_inst_i : if i > 0 and i < L generate
             attribute loc of carry4_inst_i : label is "SLICE_X" & 
-                integer'image(xoff) & "Y" & integer'image(yoff+i);
+                integer'image(X) & "Y" & integer'image(Y+i);
         begin
             carry4_inst_i : CARRY4
             port map (
@@ -124,7 +125,7 @@ begin
 
     gen_fdce_inst : for i in 0 to N-1 generate
         attribute loc of fdce_inst_i : label is "SLICE_X" & 
-            integer'image(xoff) & "Y" & integer'image(yoff+i);
+            integer'image(X) & "Y" & integer'image(Y+i);
     begin
         fdce_inst_i : FDCE
         port map (

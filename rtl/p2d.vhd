@@ -40,7 +40,9 @@ architecture bhv of p2d is
     component scntr is
     generic (
         L : natural := 4*work.common.CC_MAX_LEN; -- Length carry chain
-        N : natural := N   
+        N : natural := N;
+        X : integer := 0;
+        Y : integer := 0
     );
     port (
         i_trg : in  std_logic;                     -- Trigger
@@ -78,7 +80,9 @@ begin
     scntr_0 : scntr
     generic map(
         L => 512,
-        N => N 
+        N => N,
+        X => 60,
+        Y => 0
     )
     port map(
         i_trg => trg,
