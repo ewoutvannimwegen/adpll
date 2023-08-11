@@ -10,8 +10,8 @@ use work.common.all;
 -- Very basic implementation for now, not scalable at all
 entity disp_drv is
     generic (
-        R : natural := 8; -- Resolution input
-        N : natural := 3 -- Number of 7-segment displays
+        R : natural := 7; -- Resolution input
+        N : natural := 2 -- Number of 7-segment displays
     );
     port (
         i_clk : in  std_logic;                    -- System clock
@@ -50,42 +50,14 @@ begin
         );
     end generate gen_bin2seg;
 
-    gen_seg_1 : if N = 1 generate
-        process(i_rst, i_clk) 
-        begin
-            if i_rst = '1' then
-                bcd <= (others => '0');
-            elsif rising_edge(i_clk) then
-                bcd(3 downto 0) <= std_logic_vector(resize(
-                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
-            end if;
-        end process;
-    end generate gen_seg_1;
-    gen_seg_2 : if N = 2 generate
-        process(i_rst, i_clk) 
-        begin
-            if i_rst = '1' then
-                bcd <= (others => '0');
-            elsif rising_edge(i_clk) then
-                bcd(7 downto 4) <= std_logic_vector(resize(
-                    (unsigned(i_dec) - unsigned(i_dec) / 100 * 100) / 10, 4));
-                bcd(3 downto 0) <= std_logic_vector(resize(
-                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
-            end if;
-        end process;
-    end generate gen_seg_2;
-    gen_seg_3 : if N = 3 generate
-        process(i_rst, i_clk) 
-        begin
-            if i_rst = '1' then
-                bcd <= (others => '0');
-            elsif rising_edge(i_clk) then
-                bcd(11 downto 8) <= std_logic_vector(resize(unsigned(i_dec) / 100, 4));
-                bcd(7 downto 4) <= std_logic_vector(resize(
-                    (unsigned(i_dec) - unsigned(i_dec) / 100 * 100) / 10, 4));
-                bcd(3 downto 0) <= std_logic_vector(resize(
-                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
-            end if;
-        end process;
-    end generate gen_seg_3;
+    process(i_rst, i_clk) 
+    begin
+        if i_rst = '1' then
+            bcd <= (others => '0');
+        elsif rising_edge(i_clk) then
+            bcd(7 downto 4) <= std_logic_vector(resize(unsigned(i_dec) / 10, 4));
+            bcd(3 downto 0) <= std_logic_vector(resize(
+                unsigned(i_dec) - unsigned(i_dec) / 10 * 10, 4));
+        end if;
+    end process;
 end bhv;

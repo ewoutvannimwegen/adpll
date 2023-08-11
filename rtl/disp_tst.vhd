@@ -9,8 +9,8 @@ use work.common.all;
 -- Analog Digital Converter Top Level
 entity disp_tst is
     generic (
-        R : natural := 8; 
-        N : natural := 3  
+        R : natural := 7; 
+        N : natural := 2  
     );
     port (
         i_clk : in  std_logic;                       -- System clock
@@ -25,8 +25,8 @@ architecture bhv of disp_tst is
     -- Display driver
     component disp_drv is
     generic (
-        R : natural := 8;
-        N : natural := 3 -- Number of 7-segment displays
+        R : natural := 7;
+        N : natural := 2 -- Number of 7-segment displays
     );
     port (
         i_clk : in  std_logic;                       -- System clock
@@ -67,9 +67,7 @@ begin
             if pre(pre'high) = '1' then
                 cnt <= std_logic_vector(unsigned(cnt) + 1);
                 pre <= (others => '0');
-
-                -- Only 1 7-seg connected so lets not go further than that one
-                if cnt(3) = '1' and cnt(0) = '1' then
+                if unsigned(cnt) = 99 then
                     cnt <= (others => '0');
                 end if;
             end if;
