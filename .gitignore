@@ -9,6 +9,7 @@
 !sim/*.do
 
 !snickerdoodle_black_constraints.xdc
+!adc_tb.fzz
 
 !.gitignore
 !hdl-prj.json
