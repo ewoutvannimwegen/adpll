@@ -18,21 +18,23 @@ entity s2b is
 end s2b;
 
 architecture bhv of s2b is
-    attribute dont_touch : string;
     constant cs : work.common.natural_vector(R-3 downto 0) := (3, 7, 15, 31, 63);
 
     signal mo0 : std_logic_vector(cs(0)-1 downto 0) := (others => '0'); 
-    attribute dont_touch of mo0 : signal is "true";
     signal mo1 : std_logic_vector(cs(1)-1 downto 0) := (others => '0'); 
-    attribute dont_touch of mo1 : signal is "true";
     signal mo2 : std_logic_vector(cs(2)-1 downto 0) := (others => '0'); 
-    attribute dont_touch of mo2 : signal is "true";
     signal mo3 : std_logic_vector(cs(3)-1 downto 0) := (others => '0'); 
-    attribute dont_touch of mo3 : signal is "true";
     signal mo4 : std_logic_vector(cs(4)-1 downto 0) := (others => '0'); 
-    attribute dont_touch of mo4 : signal is "true";
     signal mid : std_logic_vector(R-3 downto 0)     := (others => '0');
-    attribute dont_touch of mid : signal is "true";
+
+    -- Figure out a way to do this with a DBG constant
+    attribute dont_touch : string;
+    --attribute dont_touch of mo0 : signal is "true";
+    --attribute dont_touch of mo1 : signal is "true";
+    --attribute dont_touch of mo2 : signal is "true";
+    --attribute dont_touch of mo3 : signal is "true";
+    --attribute dont_touch of mo4 : signal is "true";
+    --attribute dont_touch of mid : signal is "true";
 begin
     assert false report "Column sizes: " & 
         integer'image(cs(0)) & " " &

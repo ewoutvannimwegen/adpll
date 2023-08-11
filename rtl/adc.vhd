@@ -23,7 +23,6 @@ entity adc is
 end adc;
 
 architecture bhv of adc is
-    attribute dont_touch : string;
 
     -- Shift counter 
     component scntr is
@@ -48,6 +47,8 @@ architecture bhv of adc is
     signal scntr_fe_trg : std_logic := '0';
     signal scntr_fe_in  : std_logic := '0';
     signal scntr_fe_out : std_logic_vector(R-2 downto 0) := (others => '0');
+    
+    attribute dont_touch : string;
 
 begin
     o_rf <= rf;
@@ -57,8 +58,8 @@ begin
     LVDS_0 : IBUFDS
     generic map (
        DIFF_TERM => FALSE, -- Differential Termination
-       IBUF_LOW_PWR => TRUE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
-       IOSTANDARD => "DEFAULT")
+       IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
+       IOSTANDARD => "LVCMOS33")
     port map (
        O => lvds,  -- Buffer output
        I => i_rf,  -- Diff_p buffer input (connect directly to top-level port)

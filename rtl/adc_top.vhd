@@ -14,9 +14,9 @@ entity adc_top is
     );
     port (
         i_clk : in  std_logic;                     -- System clock
-        i_in  : in  std_logic;                     -- Input signal
-        i_rf  : in  std_logic;                     -- Reference clock 
-        i_rst : in  std_logic;                     -- Reset
+        i_in_N  : in  std_logic;                     -- Input signal
+        i_rf_P  : in  std_logic;                     -- Reference clock 
+        --i_rst : in  std_logic;                     -- Reset
         o_rf  : out std_logic;                     -- Reference clock
         o_seg : out std_logic_vector(7*N-1 downto 0) -- Digital output
     );
@@ -67,9 +67,9 @@ begin
     port map
     (
         i_clk => i_clk,
-        i_in => i_in,
-        i_rf => i_rf,
-        i_rst => i_rst,
+        i_in => i_in_N,
+        i_rf => i_rf_P,
+        i_rst => '0',
         o_rf => o_rf,
         o_out => dec
     );
@@ -81,7 +81,7 @@ begin
     )
     port map(
         i_clk => i_clk,
-        i_rst => i_rst,
+        i_rst => '0',
         i_dec => dec,
         o_seg => o_seg
     );

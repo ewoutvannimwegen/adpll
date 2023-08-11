@@ -8,6 +8,8 @@
 !sim/*.v*
 !sim/*.do
 
+!snickerdoodle_black_constraints.xdc
+
 !.gitignore
 !hdl-prj.json
 !readme.md

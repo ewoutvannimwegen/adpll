@@ -39,6 +39,24 @@ Meaning that the chain stays linear if the size is increased, but
 we can not have a chain larger than the height of the FPGA, for
 the Zynq-7000 series it is 150.
 
+## Voltage level IO bank
+
+The IO bank is powered at 1.8/2.5V not 3.3V, the 1.8/2.5V is needed to get the 
+differential pairs to work, see Xilinx/AMD docs:
+
+```text
+The LVDS I/O standard is only available in the HP I/O banks. It requires a VCCO to be
+powered at 1.8V for outputs and for inputs when the optional internal differential
+termination is implemented (DIFF_TERM = TRUE).
+The LVDS_25 I/O standard is only available in the HR I/O banks. It requires a VCCO to be
+powered at 2.5V for outputs and for inputs when the optional internal differential
+termination is implemented (DIFF_TERM = TRUE).
+```
+
+The JC1 bank is a 'High Range (HR)' bank, only 2.5V possible.
+The 1V8 ports on headers such as PA1 and PA2 can provide 1.8V. 
+The 2.5V can be found on header J18.
+
 ## Sources 
 
 - [PLL ZipCPU documentation](https://zipcpu.com/dsp/2017/12/14/logic-pll.html)
@@ -53,6 +71,7 @@ the Zynq-7000 series it is 150.
 - [Xilinx/AMD external simulators](https://docs.xilinx.com/r/en-US/ug900-vivado-logic-simulation/Running-Timing-Simulation-Using-Third-Party-Tools)
 - [Xilinx/AMD carry chains](https://docs.xilinx.com/v/u/en-US/ug474_7Series_CLB)
 - [Xilinx/AMD IBUFDS (differential input buffer)](https://docs.xilinx.com/r/en-US/ug953-vivado-7series-libraries/IBUFDS)
+- [Voltage level IO-bank](https://krtkl.com/faq-items/snickerdoodle-io-voltage/)
 
 Post-synthesis timing simulation requires a Verilog based testbench, VHDL not supported!
 

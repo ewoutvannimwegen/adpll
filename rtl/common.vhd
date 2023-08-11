@@ -5,6 +5,7 @@ use ieee.math_real.all;
 
 package common is
     type natural_vector is array (natural range <>) of natural; 
+    constant DBG         : std_logic := '0'; -- Debug mode
     constant CC_MAX_LEN  : integer := 150; -- Max length CARRY4 chain
     constant CARRY4_PDLY : natural := 187; -- Propegation delay CARRY4 in ps
     constant T_CLK       : natural := 20000; -- Period system clock in ps
@@ -12,7 +13,6 @@ package common is
     function cnt_ones  (s : std_logic_vector) return natural;
     function get_off   (mid : std_logic_vector; cs : natural_vector) return natural;
     function f_log2 (x : positive) return natural;
-    function dec2bcd   (dec : std_logic_vector) return std_logic_vector;
 end common;
 
 package body common is
@@ -54,11 +54,13 @@ package body common is
         return off;
     end function;
 
+    -- Synthesis friendly log2 function
     function f_log2 (x : positive) return natural is
       variable i : natural := x;
       variable n : natural := 0;
     begin
-        while (i > 1) loop
+        -- n < 31 Avoid elab error about loop not constraint for converging
+        while (i > 1 and n < 31) loop
             i := i / 2;
             n := n + 1;
         end loop;
@@ -68,28 +70,4 @@ package body common is
             return n;
         end if;
    end function;
-    
-    function dec2bcd (
-        dec : std_logic_vector
-    ) return std_logic_vector is 
-        variable dig : natural := natural(f_log2(to_integer(unsigned(dec)))/f_log2(10)) + 1;
-        variable tmp : unsigned(dec'length-1 downto 0) := unsigned(dec);
-        variable bcd : std_logic_vector((natural(f_log2(to_integer(unsigned(dec)))/f_log2(10))+1)*4-1 downto 0) := (others => '0');
-    begin
-        assert false report "dec: " & to_string(dec) severity note;
-        assert false report "dig: " & natural'image(dig) severity note;
-
-        for i in 0 to dig-1 loop
-            assert false report "tmp(" & natural'image(i) & "): " & 
-                integer'image(to_integer(tmp)) severity note;
-
-            bcd(4*i+4-1 downto 4*i) := std_logic_vector(resize(
-                tmp / (10**(dig-1-i)), 4));
-            tmp := resize(tmp - resize(unsigned(bcd(4*i+4-1 downto 4*i)), 
-                tmp'length) * (10**(dig-1-i)), tmp'length);
-            assert false report "bcd(" & natural'image(i) & "): " &
-                to_string(bcd(4*i+4-1 downto 4*i)) severity note;
-        end loop;
-        return bcd;
-    end function;
 end common;

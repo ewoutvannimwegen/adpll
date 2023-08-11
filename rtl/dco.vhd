@@ -23,14 +23,15 @@ end dco;
 -- After finding a valid phase error the correction is only applied once.
 architecture bhv of dco is
     constant FDIV : natural := natural(ceil(real(work.common.T_CLK)/real(work.common.CARRY4_PDLY)));
-    attribute dont_touch : string;
     signal cnt  : std_logic_vector(R-1 downto 0) := (others => '0'); -- Internal counter
-    attribute dont_touch of cnt : signal is "true";
     signal ab   : std_logic_vector(R-1 downto 0) := (others => '0'); -- Absolute phase error in steps
-    attribute dont_touch of ab : signal is "true";
     signal cor  : std_logic := '0';                                  -- Phase correction flag
-    attribute dont_touch of cor : signal is "true";
     signal step : std_logic_vector(R-1 downto 0) := (others => '0');   -- Step size 
+
+    attribute dont_touch : string;
+    --attribute dont_touch of cnt : signal is "true";
+    --attribute dont_touch of ab : signal is "true";
+    --attribute dont_touch of cor : signal is "true";
 begin
     o_gen <= cnt(R-1); -- Generate clock based on MSB of internal counter
 

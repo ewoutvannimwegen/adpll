@@ -6,7 +6,8 @@ use ieee.numeric_std.all;
 use ieee.math_real.all;
 use work.common.all;
 
--- Display
+-- Display Driver
+-- Very basic implementation for now, not scalable at all
 entity disp_drv is
     generic (
         R : natural := 8; -- Resolution input
@@ -28,6 +29,9 @@ architecture bhv of disp_drv is
 
     -- Binary to Segment
     component bin2seg is
+    generic (
+        M : std_logic := '0' -- Mode 0: cathode, 1: anode
+    );
     port (
         i_bcd : in  std_logic_vector(3 downto 0);
         o_seg : out std_logic_vector(6 downto 0)
@@ -35,23 +39,53 @@ architecture bhv of disp_drv is
     end component;
 
 begin
-    bin2seg_gen : for i in 0 to N-1 generate
+    gen_bin2seg : for i in 0 to N-1 generate
         bin2seg_i : bin2seg
+        generic map(
+            M => '0'
+        )
         port map(
             i_bcd => bcd(4*i+4-1 downto 4*i),
             o_seg => o_seg(7*i+7-1 downto 7*i)
         );
-    end generate;
+    end generate gen_bin2seg;
 
-    process(i_rst, i_clk) 
-    begin
-        if i_rst = '1' then
-            bcd <= (others => '0');
-        elsif rising_edge(i_clk) then
-            if to_integer(unsigned(i_dec)) > 0 then
-                bcd <= std_logic_vector(resize(unsigned(work.common.dec2bcd(i_dec)), bcd'length));
+    gen_seg_1 : if N = 1 generate
+        process(i_rst, i_clk) 
+        begin
+            if i_rst = '1' then
+                bcd <= (others => '0');
+            elsif rising_edge(i_clk) then
+                bcd(3 downto 0) <= std_logic_vector(resize(
+                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
             end if;
-        end if;
-    end process;
-
+        end process;
+    end generate gen_seg_1;
+    gen_seg_2 : if N = 2 generate
+        process(i_rst, i_clk) 
+        begin
+            if i_rst = '1' then
+                bcd <= (others => '0');
+            elsif rising_edge(i_clk) then
+                bcd(7 downto 4) <= std_logic_vector(resize(
+                    (unsigned(i_dec) - unsigned(i_dec) / 100 * 100) / 10, 4));
+                bcd(3 downto 0) <= std_logic_vector(resize(
+                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
+            end if;
+        end process;
+    end generate gen_seg_2;
+    gen_seg_3 : if N = 3 generate
+        process(i_rst, i_clk) 
+        begin
+            if i_rst = '1' then
+                bcd <= (others => '0');
+            elsif rising_edge(i_clk) then
+                bcd(11 downto 8) <= std_logic_vector(resize(unsigned(i_dec) / 100, 4));
+                bcd(7 downto 4) <= std_logic_vector(resize(
+                    (unsigned(i_dec) - unsigned(i_dec) / 100 * 100) / 10, 4));
+                bcd(3 downto 0) <= std_logic_vector(resize(
+                    unsigned(i_dec) - unsigned(i_dec) / 100 * 100, 4));
+            end if;
+        end process;
+    end generate gen_seg_3;
 end bhv;

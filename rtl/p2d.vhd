@@ -23,7 +23,6 @@ end p2d;
 -- The sign of the error is determined by the first system
 -- The absolute value of the error by the second
 architecture bhv of p2d is
-    attribute dont_touch : string;
 
     -- Phase Frequency Detector
     component pfd is
@@ -60,10 +59,12 @@ architecture bhv of p2d is
     signal lvl  : std_logic := '0'; -- Logic level last coincide
     signal lvl_nxt  : std_logic := '0';
     signal vld  : std_logic_vector(5 downto 0)   := (others => '0'); -- Valid 
-    attribute dont_touch of vld : signal is "true";
     signal ab   : std_logic_vector(R-2 downto 0) := (others => '0'); -- Absolute phase error
-    attribute dont_touch of ab : signal is "true";
     signal trg : std_logic := '0'; -- Trigger
+    
+    attribute dont_touch : string;
+    --attribute dont_touch of vld : signal is "true";
+    --attribute dont_touch of ab : signal is "true";
 begin
 
     -- Phase Frequency Detector
