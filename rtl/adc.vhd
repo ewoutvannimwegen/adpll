@@ -59,7 +59,7 @@ begin
     generic map (
        DIFF_TERM => FALSE, -- Differential Termination
        IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
-       IOSTANDARD => "LVCMOS33")
+       IOSTANDARD => "LVDS_25")
     port map (
        O => lvds,  -- Buffer output
        I => i_rf,  -- Diff_p buffer input (connect directly to top-level port)

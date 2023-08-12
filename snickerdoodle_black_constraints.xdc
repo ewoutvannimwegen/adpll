@@ -103,18 +103,18 @@ set_property IOSTANDARD     LVCMOS25    [get_ports {o_seg[7]}]
 #set_property IOSTANDARD     LVCMOS25    [get_ports {o_seg[19]}]
 #
 ### JC1.35 (IO_L14P_T2_SRCC_13)
-#set_property PACKAGE_PIN    Y9           [get_ports {i_rf_P}]
-#set_property IOSTANDARD     LVDS_25      [get_ports {i_rf_P}]
+set_property PACKAGE_PIN    Y9           [get_ports {i_rf_P}]
+set_property IOSTANDARD     LVDS_25      [get_ports {i_rf_P}]
 #
 #### JC1.36 (IO_L13N_T2_MRCC_13)
 #set_property PACKAGE_PIN    Y6          [get_ports {o_seg[20]}]
 #set_property IOSTANDARD     LVCMOS25    [get_ports {o_seg[20]}]
 
 ## JC1.37 (IO_L14N_T2_SRCC_13)
-#set_property PACKAGE_PIN    Y8           [get_ports {i_in_N}]
-#set_property IOSTANDARD     LVDS_25      [get_ports {i_in_N}]
+set_property PACKAGE_PIN    Y8           [get_ports {i_in_N}]
+set_property IOSTANDARD     LVDS_25      [get_ports {i_in_N}]
 
 ## JC1.38 (IO_L13P_T2_MRCC_13)
-#set_property PACKAGE_PIN    Y7          [get_ports {o_rf}]
-#set_property IOSTANDARD     LVCMOS25    [get_ports {o_rf}]
+set_property PACKAGE_PIN    Y7          [get_ports {o_rf}]
+set_property IOSTANDARD     LVCMOS25    [get_ports {o_rf}]
 

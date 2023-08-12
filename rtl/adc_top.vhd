@@ -10,13 +10,13 @@ use work.common.all;
 entity adc_top is
     generic (
         R : natural := 8;
-        N : natural := 3 -- Number of 7-segment displays
+        N : natural := 2 -- Number of 7-segment displays
     );
     port (
         i_clk : in  std_logic;                     -- System clock
         i_in_N  : in  std_logic;                     -- Input signal
         i_rf_P  : in  std_logic;                     -- Reference clock 
-        --i_rst : in  std_logic;                     -- Reset
+        i_nrst : in  std_logic;                     -- Reset
         o_rf  : out std_logic;                     -- Reference clock
         o_seg : out std_logic_vector(7*N-1 downto 0) -- Digital output
     );
@@ -44,8 +44,8 @@ architecture bhv of adc_top is
     -- Display driver
     component disp_drv is
     generic (
-        R : natural := 8;
-        N : natural := 3 -- Number of 7-segment displays
+        R : natural := 7;
+        N : natural := 2 -- Number of 7-segment displays
     );
     port (
         i_clk : in  std_logic;                       -- System clock
@@ -56,8 +56,10 @@ architecture bhv of adc_top is
     end component;
 
     signal dec : std_logic_vector(R-1 downto 0) := (others => '0');
-
+    signal rst : std_logic := '0';
 begin
+
+    rst <= not i_nrst;
 
     adc_inst : adc
     generic map (
@@ -69,7 +71,7 @@ begin
         i_clk => i_clk,
         i_in => i_in_N,
         i_rf => i_rf_P,
-        i_rst => '0',
+        i_rst => rst, 
         o_rf => o_rf,
         o_out => dec
     );
@@ -77,11 +79,11 @@ begin
     disp_drv_inst : disp_drv 
     generic map (
         R => R,
-        N => 3
+        N => N
     )
     port map(
         i_clk => i_clk,
-        i_rst => '0',
+        i_rst => rst,
         i_dec => dec,
         o_seg => o_seg
     );
